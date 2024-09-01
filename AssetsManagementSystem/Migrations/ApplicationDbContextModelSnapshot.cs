@@ -4,7 +4,6 @@ using AssetsManagementSystem.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,11 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetsManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240831070658_IntialCreation")]
-    partial class IntialCreation
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -247,6 +244,9 @@ namespace AssetsManagementSystem.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool?>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUserTransfer")
                         .HasColumnType("bit");
 
                     b.Property<string>("RejectionReason")
@@ -486,29 +486,29 @@ namespace AssetsManagementSystem.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5285f833-cb8c-48b3-b51a-ea09a55e6900"),
-                            ConcurrencyStamp = "c9bda18c-be45-49ce-8943-524cce790079",
+                            Id = new Guid("7ad484e4-cf24-4756-8b72-9e70f591eb70"),
+                            ConcurrencyStamp = "2824b0c6-7f11-4c48-b5da-fe87f9b35f6c",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = new Guid("01b58219-7834-4c2e-abff-d5b878276f96"),
-                            ConcurrencyStamp = "acbfa334-47c7-4b73-ad21-af6917afbc03",
+                            Id = new Guid("0ffb0e3b-6931-42b7-beee-464b3bad6b66"),
+                            ConcurrencyStamp = "ab7b1954-9f3a-4630-9794-c03b4b68c20a",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
-                            Id = new Guid("50ddc3f5-11da-4df0-94ca-1ef2871d4a5f"),
-                            ConcurrencyStamp = "8a9d9e15-82aa-46bf-8d96-3cd30e4c1967",
+                            Id = new Guid("acfc5283-b4a1-45be-ad39-a11193efe39f"),
+                            ConcurrencyStamp = "aba164ce-5b2b-44d8-8747-68679273b472",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
-                            Id = new Guid("94201fa8-b0aa-40b8-b63f-d3130f5e53e4"),
-                            ConcurrencyStamp = "cd64247c-ac81-4396-91bc-c566de9e868b",
+                            Id = new Guid("9bb2167e-7612-4958-b350-2a2896fb2d4e"),
+                            ConcurrencyStamp = "8a6971e7-3fde-457c-b53c-d470a132276f",
                             Name = "Auditor",
                             NormalizedName = "AUDITOR"
                         });
@@ -662,6 +662,10 @@ namespace AssetsManagementSystem.Migrations
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("UserStatus")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

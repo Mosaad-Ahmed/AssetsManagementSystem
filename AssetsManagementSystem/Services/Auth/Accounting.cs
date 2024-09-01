@@ -73,7 +73,7 @@
 
             user.RefreshToken = _RefreshToken;
             user.RefreshTokenExpiryTime = DateTime.Now.AddDays(refreshTokenValidityInDays);
-
+            user.UserStatus=UserStatus.Active.ToString();
             await userManager.UpdateAsync(user);
             await userManager.UpdateSecurityStampAsync(user);
 
