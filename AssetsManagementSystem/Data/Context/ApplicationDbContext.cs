@@ -7,12 +7,12 @@ namespace AssetsManagementSystem.Data.Context
 {
     public class ApplicationDbContext:IdentityDbContext<User,Role,Guid>
     {
-        //private readonly AssetLifecycleInterceptor _assetLifecycleInterceptor;
+       // private readonly AssetLifecycleInterceptor _assetLifecycleInterceptor;
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> optionsBuilder)//, AssetLifecycleInterceptor assetLifecycleInterceptor)
             : base(optionsBuilder) 
         {
-        //    _assetLifecycleInterceptor = assetLifecycleInterceptor;
+          // _assetLifecycleInterceptor = assetLifecycleInterceptor;
 
         }
 
@@ -30,10 +30,11 @@ namespace AssetsManagementSystem.Data.Context
 
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.AddInterceptors(_assetLifecycleInterceptor);
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+           // optionsBuilder.AddInterceptors(_assetLifecycleInterceptor);
+        }
         public virtual DbSet<User> users { get; set; }
         public virtual DbSet<Asset> Assets { get; set; }
         public virtual DbSet<AssetDisposalRecord> AssetDisposalRecords { get; set; }

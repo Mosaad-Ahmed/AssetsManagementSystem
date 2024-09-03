@@ -1,34 +1,37 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
+﻿using AssetsManagementSystem.Models.DbSets;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Threading;
 
 namespace AssetsManagementSystem.Data.UnitOfWorks.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext dbContext;
-        private readonly AssetLifecycleInterceptor assetLifecycleInterceptor;
+       // private readonly AssetLifecycleInterceptor assetLifecycleInterceptor;
         private IDbContextTransaction contextTransaction;
 
-        public UnitOfWork(ApplicationDbContext dbContext,
-                          AssetLifecycleInterceptor assetLifecycleInterceptor)
+        public UnitOfWork(ApplicationDbContext dbContext)//,AssetLifecycleInterceptor assetLifecycleInterceptor)
         {
             this.dbContext = dbContext;
-            this.assetLifecycleInterceptor = assetLifecycleInterceptor;
+         //   this.assetLifecycleInterceptor = assetLifecycleInterceptor;
 
         }
 
 
-        public async ValueTask DisposeAsync()=>await dbContext.DisposeAsync();
+        public async ValueTask DisposeAsync() => await dbContext.DisposeAsync();
 
 
         public int SaveChange() => dbContext.SaveChanges();
-        
-        public async Task<int> SaveChangeAsync()=>await dbContext.SaveChangesAsync();
+
+        public async Task<int> SaveChangeAsync()
+        {
+            return await dbContext.SaveChangesAsync();
+        }
+
+        IReadRepository<T> IUnitOfWork.readRepository<T>() => new ReadRepository<T>(dbContext);
 
 
-          IReadRepository<T> IUnitOfWork.readRepository<T>() => new ReadRepository<T>(dbContext);
-         
-
-          IWriteRepository<T> IUnitOfWork.writeRepository<T>()=>new WriteRepository<T>(dbContext);
+        IWriteRepository<T> IUnitOfWork.writeRepository<T>() => new WriteRepository<T>(dbContext);
 
 
         public async Task BeginTransactionAsync()
@@ -68,6 +71,6 @@ namespace AssetsManagementSystem.Data.UnitOfWorks.UnitOfWork
             }
         }
 
-
+        
     }
 }

@@ -47,7 +47,8 @@ namespace AssetsManagementSystem.Services.Suppliers
                 throw new ArgumentException("Invalid supplier ID.");
             }
 
-            var supplier = await UnitOfWork.readRepository<Supplier>().GetAsync(s => s.Id == supplierId);
+            var supplier = await UnitOfWork.readRepository<Supplier>().GetAsync(s => s.Id == supplierId 
+            && (s.IsDeleted==false || s.IsDeleted==null));
 
             GetSupplierRequestDTO getSupplierRequestDTO = Mapper.Map<GetSupplierRequestDTO, Supplier>(supplier);
 
@@ -63,8 +64,10 @@ namespace AssetsManagementSystem.Services.Suppliers
         #region Retrieve all suppliers
         public async Task<IEnumerable<GetSupplierRequestDTO>> GetAllSuppliersAsync()
         {
-           var Suppliers=await UnitOfWork.readRepository<Supplier>().GetAllAsync();
-           var getSupplierRequestDTOs = 
+           var Suppliers=await UnitOfWork.readRepository<Supplier>()
+                .GetAllAsync(predicate: s=> (s.IsDeleted == false || s.IsDeleted == null));
+         
+            var getSupplierRequestDTOs = 
                 Mapper.Map<GetSupplierRequestDTO, Supplier>(Suppliers);
 
             return getSupplierRequestDTOs;
@@ -111,6 +114,11 @@ namespace AssetsManagementSystem.Services.Suppliers
         {
             var supplierDTO = await GetSupplierByIdAsync(supplierId);
 
+            var asset= await UnitOfWork.readRepository<Asset>()
+                .GetAsync(predicate:a=>a.AssetsSuppliers.Any(As=>As.SupplierId==supplierId));
+            if (asset is not null)
+                throw new InvalidOperationException("There are suppliers dependent on this supplier,Please Go and delete it first");
+                 
             var supplier = Mapper.Map<Supplier, GetSupplierRequestDTO>(supplierDTO);
 
 

@@ -1,5 +1,6 @@
 ﻿
 using AssetsManagementSystem.DTOs.LocationDTOs;
+using AssetsManagementSystem.Models.DbSets;
 
 namespace AssetsManagementSystem.Services.Locations
 {
@@ -47,7 +48,8 @@ namespace AssetsManagementSystem.Services.Locations
                 throw new ArgumentException("Invalid location ID.");
             }
 
-            var location = await UnitOfWork.readRepository<Location>().GetAsync(l => l.Id == locationId);
+            var location = await UnitOfWork.readRepository<Location>()
+                .GetAsync(l => l.Id == locationId && (l.IsDeleted == false || l.IsDeleted == null));
             var getLocationRequestDTO = Mapper.Map<GetLocationRequestDTO,Location>(location);
 
             if (location == null)
@@ -62,7 +64,8 @@ namespace AssetsManagementSystem.Services.Locations
         #region Retrieve all locations
         public async Task<IEnumerable<GetLocationRequestDTO>> GetAllLocationsAsync()
         {
-             var Locations= await UnitOfWork.readRepository<Location>().GetAllAsync();
+            var Locations = await UnitOfWork.readRepository<Location>()
+               .GetAllAsync(predicate: l=> (l.IsDeleted == false || l.IsDeleted == null));
 
             var GetLocationRequestDTOs = Mapper.Map<GetLocationRequestDTO,Location>(Locations);
 
@@ -82,7 +85,8 @@ namespace AssetsManagementSystem.Services.Locations
             var location = Mapper.Map<Location,GetLocationRequestDTO>(updateLocation);
 
             var existingLocation = await UnitOfWork.readRepository<Location>()
-                                      .GetAsync(l => l.Name == updateLocationRequest.Name && l.Id != locationId);
+                                      .GetAsync(l => l.Name == updateLocationRequest.Name && l.Id != locationId 
+                                      && (l.IsDeleted == false || l.IsDeleted == null));
 
             if (existingLocation != null)
             {
@@ -91,7 +95,7 @@ namespace AssetsManagementSystem.Services.Locations
 
             location.Name = updateLocationRequest.Name;
             location.Address = updateLocationRequest.Address;
-            location.UpdatedDate= DateTime.UtcNow;
+            location.UpdatedDate= DateTime.Now;
             location.AddedOnDate = location.AddedOnDate;
             await UnitOfWork.writeRepository<Location>().UpdateAsync(location.Id, location);
 
@@ -104,9 +108,15 @@ namespace AssetsManagementSystem.Services.Locations
         {
             var updateLocation = await GetLocationByIdAsync(locationId);
 
+            var asset = await UnitOfWork.readRepository<Asset>()
+              .GetAsync(predicate: a => a.LocationId == locationId && (a.IsDeleted == false || a.IsDeleted == null));
+          
+            if (asset is not null)
+                throw new InvalidOperationException("There are suppliers dependent on this supplier,Please Go and delete it first");
+           
             var location = Mapper.Map<Location, GetLocationRequestDTO>(updateLocation);
 
-            location.DeletedDate = DateTime.UtcNow;
+            location.DeletedDate = DateTime.Now;
             location.IsDeleted = true;
             
             await UnitOfWork.writeRepository<Location>().UpdateAsync(location.Id, location);

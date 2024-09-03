@@ -9,11 +9,10 @@
                 opt =>
                 {
                     opt.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-                   // opt.AddInterceptors(services.BuildServiceProvider().GetRequiredService<AssetLifecycleInterceptor>());
-                }
+                 }
           );
 
-            services.AddScoped<AssetLifecycleInterceptor>();
+           // services.AddScoped<AssetLifecycleInterceptor>();
 
 
             services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));

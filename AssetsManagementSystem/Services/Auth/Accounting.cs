@@ -42,6 +42,7 @@
             user.SecurityStamp = Guid.NewGuid().ToString();
 
             user.AddedOnDate = DateTime.Now;
+            user.UserStatus=UserStatus.Suspended.ToString();
 
             IdentityResult result = await userManager.CreateAsync(user, registerationRequest.Password);
 

@@ -51,7 +51,7 @@
 
 
         [MaxLength(1000, ErrorMessage = "Rejection reason cannot exceed 1000 characters.")]
-        public string RejectionReason { get; set; }
+        public string? RejectionReason { get; set; }
 
 
         public bool IsUserTransfer { get; set; }

@@ -2,7 +2,9 @@
 using AssetsManagementSystem.Services.AssetDisposal;
 using AssetsManagementSystem.Services.AssetMaintenance;
 using AssetsManagementSystem.Services.Assets;
+using AssetsManagementSystem.Services.AssetTransfer;
 using AssetsManagementSystem.Services.Categories;
+using AssetsManagementSystem.Services.Document;
 using AssetsManagementSystem.Services.Locations;
 using AssetsManagementSystem.Services.SubCategory;
 using AssetsManagementSystem.Services.Suppliers;
@@ -31,6 +33,9 @@ namespace AssetsManagementSystem.Services
 
             services.AddScoped<SubCategoryerService>();
 
+            services.AddScoped<AssetTransferService>();
+
+            services.AddScoped<DocumentService>();
         }
     }
 }

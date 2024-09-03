@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using AssetsManagementSystem.Others.Storage;
+using System.Text;
 
 namespace AssetsManagementSystem.Others
 {
@@ -11,8 +12,9 @@ namespace AssetsManagementSystem.Others
             services.Configure<TokenSettings>(configuration.GetSection("JWT"));
             services.AddTransient<ITokenService, TokenService>();
             services.AddSingleton<Interfaces.IAutoMapper.IMapper, AutoMapper.Mapper>();
+             services.AddSingleton<IFileService, FileService>();
 
-            #region Authentication
+            #region Authenticationس
             services.AddAuthentication
                 (
                 opt =>

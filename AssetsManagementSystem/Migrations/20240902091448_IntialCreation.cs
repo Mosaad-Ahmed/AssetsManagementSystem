@@ -431,7 +431,7 @@ namespace AssetsManagementSystem.Migrations
                     TransferDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     ApprovalDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    RejectionReason = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    RejectionReason = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     IsUserTransfer = table.Column<bool>(type: "bit", nullable: false),
                     AddedOnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -503,10 +503,10 @@ namespace AssetsManagementSystem.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("0ffb0e3b-6931-42b7-beee-464b3bad6b66"), "ab7b1954-9f3a-4630-9794-c03b4b68c20a", "User", "USER" },
-                    { new Guid("7ad484e4-cf24-4756-8b72-9e70f591eb70"), "2824b0c6-7f11-4c48-b5da-fe87f9b35f6c", "Admin", "ADMIN" },
-                    { new Guid("9bb2167e-7612-4958-b350-2a2896fb2d4e"), "8a6971e7-3fde-457c-b53c-d470a132276f", "Auditor", "AUDITOR" },
-                    { new Guid("acfc5283-b4a1-45be-ad39-a11193efe39f"), "aba164ce-5b2b-44d8-8747-68679273b472", "Manager", "MANAGER" }
+                    { new Guid("62474474-f91b-483d-b0d8-2742c01146f0"), "98429fcd-66c4-4064-89e6-e6ae25da44e2", "Auditor", "AUDITOR" },
+                    { new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"), "8da190b5-8576-4f13-ae67-83eac8b7dc50", "User", "USER" },
+                    { new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"), "55c967f4-843a-43da-ae8b-d3ee858b856e", "Manager", "MANAGER" },
+                    { new Guid("fc05f613-0e97-444e-b19b-018a223a7484"), "6f553334-2478-4056-985d-0da675e629f0", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.CreateIndex(

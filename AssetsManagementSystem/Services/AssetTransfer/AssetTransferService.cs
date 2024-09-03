@@ -2,7 +2,7 @@
 
 namespace AssetsManagementSystem.Services.AssetTransfer
 {
-    public class AssetTransferService:BaseClassForServices
+    public class AssetTransferService : BaseClassForServices
     {
         private readonly UserManager<User> _userManager;
 
@@ -15,47 +15,73 @@ namespace AssetsManagementSystem.Services.AssetTransfer
             _userManager = userManager;
         }
 
-
-        #region Add Asset Transfer Record (General)
-        public async Task<GetAssetTransferRecordResponseDTO> AddAssetTransferAsync(AddAssetTransferRecordRequestDTO dto)
+        #region Location to Location Transfer
+        public async Task<GetAssetTransferRecordResponseDTO> TransferLocationToLocationAsync(LocationToLocationTransferDTO dto)
         {
-            // Validate the transfer to ensure no duplicate user or location transfer
-            ValidateTransfer(dto);
+            ValidateLocationTransfer(dto.FromLocationId, dto.ToLocationId);
 
-            // Retrieve the asset to be transferred
             var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == dto.AssetId);
             if (asset == null) throw new KeyNotFoundException("Asset not found.");
 
-            // Map DTO to Entity
-            var transferRecord = Mapper.Map<AssetTransferRecords>(dto);
-            transferRecord.IsUserTransfer = dto.FromUserId != dto.ToUserId;
-            transferRecord.Status = TransferStatus.Pending;
+            var transferRecord = new AssetTransferRecords
+            {
+                AssetId = dto.AssetId,
+                FromLocationId = dto.FromLocationId,
+                ToLocationId = dto.ToLocationId,
+                FromUserId = asset.AssignedUserId,
+                ToUserId = asset.AssignedUserId,
+                TransferDate = dto.TransferDate,
+                Status = TransferStatus.Approved
+            };
 
             await UnitOfWork.BeginTransactionAsync();
             try
             {
-                // Save the transfer record
+                await UnitOfWork.writeRepository<AssetTransferRecords>().AddAsync(transferRecord);
+                asset.LocationId = dto.ToLocationId;
+                await UnitOfWork.writeRepository<Asset>().UpdateAsync(asset.Id, asset);
+
+                await UnitOfWork.SaveChangeAsync();
+                await UnitOfWork.CommitTransactionAsync();
+
+                return Mapper.Map<GetAssetTransferRecordResponseDTO>(transferRecord);
+            }
+            catch
+            {
+                await UnitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
+        #endregion
+
+        #region User to User Transfer
+        public async Task<GetAssetTransferRecordResponseDTO> TransferUserToUserAsync(UserToUserTransferDTO dto)
+        {
+            ValidateUserTransfer(dto.FromUserId, dto.ToUserId);
+
+            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == dto.AssetId);
+            if (asset == null) throw new KeyNotFoundException("Asset not found.");
+
+            var transferRecord = new AssetTransferRecords
+            {
+                AssetId = dto.AssetId,
+                FromUserId = dto.FromUserId,
+                ToUserId = dto.ToUserId,
+                FromLocationId=asset.LocationId,
+                ToLocationId = asset.LocationId,
+                TransferDate = dto.TransferDate,
+                Status = TransferStatus.Pending ,
+                IsUserTransfer=true
+                
+            };
+
+            await UnitOfWork.BeginTransactionAsync();
+            try
+            {
                 await UnitOfWork.writeRepository<AssetTransferRecords>().AddAsync(transferRecord);
                 await UnitOfWork.SaveChangeAsync();
-
-                // Determine which action to take based on the transfer type
-                if (dto.FromUserId != dto.ToUserId && dto.FromLocationId != dto.ToLocationId)
-                {
-                    // Both user and location are changing
-                    await HandleUserAndLocationTransferAsync(dto, transferRecord, asset);
-                }
-                else if (dto.FromUserId != dto.ToUserId)
-                {
-                    // Only user is changing
-                    await HandleUserTransferAsync(dto, transferRecord);
-                }
-                else if (dto.FromLocationId != dto.ToLocationId)
-                {
-                    // Only location is changing
-                    await HandleLocationTransferAsync(asset, transferRecord);
-                }
-
                 await UnitOfWork.CommitTransactionAsync();
+
                 return Mapper.Map<GetAssetTransferRecordResponseDTO,AssetTransferRecords>(transferRecord);
             }
             catch
@@ -66,23 +92,57 @@ namespace AssetsManagementSystem.Services.AssetTransfer
         }
         #endregion
 
+        #region User and Location Transfer
+        public async Task<GetAssetTransferRecordResponseDTO> TransferUserAndLocationAsync(UserAndLocationTransferDTO dto)
+        {
+            ValidateUserTransfer(dto.FromUserId, dto.ToUserId);
+            ValidateLocationTransfer(dto.FromLocationId, dto.ToLocationId);
+
+            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == dto.AssetId);
+            if (asset == null) throw new KeyNotFoundException("Asset not found.");
+
+            var transferRecord = new AssetTransferRecords
+            {
+                AssetId = dto.AssetId,
+                FromUserId = dto.FromUserId,
+                ToUserId = dto.ToUserId,
+                FromLocationId = dto.FromLocationId,
+                ToLocationId = dto.ToLocationId,
+                TransferDate = dto.TransferDate,
+                Status = TransferStatus.Pending // Requires approval from the new user
+            };
+
+            await UnitOfWork.BeginTransactionAsync();
+            try
+            {
+                await UnitOfWork.writeRepository<AssetTransferRecords>().AddAsync(transferRecord);
+                await UnitOfWork.SaveChangeAsync();
+                await UnitOfWork.CommitTransactionAsync();
+
+                return Mapper.Map<GetAssetTransferRecordResponseDTO>(transferRecord);
+            }
+            catch
+            {
+                await UnitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
+        #endregion
 
         #region Approve Transfer
         public async Task ApproveTransferAsync(int transferId)
         {
-            var transferRecord = await UnitOfWork.readRepository<AssetTransferRecords>().GetAsync(r => r.Id == transferId);
+            var transferRecord = await UnitOfWork.readRepository<AssetTransferRecords>().GetAsync(r => r.Id == transferId,enableTracing:false);
             if (transferRecord == null) throw new KeyNotFoundException("Transfer record not found.");
             if (transferRecord.Status != TransferStatus.Pending) throw new InvalidOperationException("Transfer is not in a pending state.");
 
-            // Update the status to Approved
             transferRecord.Status = TransferStatus.Approved;
             transferRecord.ApprovalDate = DateTime.UtcNow;
 
             await UnitOfWork.BeginTransactionAsync();
             try
             {
-                // Update the asset details based on the transfer type
-                var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == transferRecord.AssetId);
+                var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == transferRecord.AssetId,enableTracing:false);
                 if (asset == null) throw new KeyNotFoundException("Asset not found.");
 
                 if (transferRecord.IsUserTransfer)
@@ -91,9 +151,12 @@ namespace AssetsManagementSystem.Services.AssetTransfer
                 }
                 asset.LocationId = transferRecord.ToLocationId;
 
-                await UnitOfWork.writeRepository<Asset>().UpdateAsync(asset.Id, asset);
                 await UnitOfWork.writeRepository<AssetTransferRecords>().UpdateAsync(transferRecord.Id, transferRecord);
+
                 await UnitOfWork.SaveChangeAsync();
+                await UnitOfWork.writeRepository<Asset>().UpdateAsync(asset.Id, asset);
+                await UnitOfWork.SaveChangeAsync();
+
                 await UnitOfWork.CommitTransactionAsync();
             }
             catch
@@ -103,7 +166,6 @@ namespace AssetsManagementSystem.Services.AssetTransfer
             }
         }
         #endregion
-
 
         #region Reject Transfer
         public async Task RejectTransferAsync(int transferId, string rejectionReason)
@@ -112,10 +174,9 @@ namespace AssetsManagementSystem.Services.AssetTransfer
             if (transferRecord == null) throw new KeyNotFoundException("Transfer record not found.");
             if (transferRecord.Status != TransferStatus.Pending) throw new InvalidOperationException("Transfer is not in a pending state.");
 
-            // Update the status to Rejected and save the rejection reason
             transferRecord.Status = TransferStatus.Rejected;
             transferRecord.RejectionReason = rejectionReason;
-            transferRecord.ApprovalDate = null;  
+            transferRecord.ApprovalDate = null;
 
             await UnitOfWork.BeginTransactionAsync();
             try
@@ -132,44 +193,49 @@ namespace AssetsManagementSystem.Services.AssetTransfer
         }
         #endregion
 
+        #region Get Asset Transfer Record by ID
+        public async Task<GetAssetTransferRecordResponseDTO> GetAssetTransferByIdAsync(int id)
+        {
+            var transferRecord = await UnitOfWork.readRepository<AssetTransferRecords>().GetAsync(tr => tr.Id == id);
+            if (transferRecord == null) throw new KeyNotFoundException("Transfer record not found.");
 
+            return Mapper.Map<GetAssetTransferRecordResponseDTO, AssetTransferRecords>(transferRecord);
+        }
+        #endregion
 
-        #region Update Asset Transfer Record
-        public async Task<GetAssetTransferRecordResponseDTO> UpdateAssetTransferAsync(int id, UpdateAssetTransferRecordRequestDTO dto)
+        #region Get All Asset Transfers
+        public async Task<IList<GetAssetTransferRecordResponseDTO>> GetAllAssetTransfersAsync()
+        {
+            var transferRecords = await UnitOfWork.readRepository<AssetTransferRecords>().GetAllAsync();
+            return Mapper.Map< GetAssetTransferRecordResponseDTO,AssetTransferRecords>(transferRecords);
+        }
+        #endregion
+
+        #region Update Location to Location Transfer
+        public async Task<GetAssetTransferRecordResponseDTO> UpdateLocationToLocationTransferAsync(int id, LocationToLocationTransferDTO dto)
         {
             var transferRecord = await UnitOfWork.readRepository<AssetTransferRecords>().GetAsync(r => r.Id == id);
             if (transferRecord == null) throw new KeyNotFoundException("Transfer record not found.");
 
-            // Validate the transfer to ensure no duplicate user or location transfer
-            ValidateTransfer(dto);
+            ValidateLocationTransfer(dto.FromLocationId, dto.ToLocationId);
 
             await UnitOfWork.BeginTransactionAsync();
             try
             {
-                // Update transfer record fields
-                UpdateTransferRecordFields(transferRecord, dto);
+                transferRecord.FromLocationId = dto.FromLocationId;
+                transferRecord.ToLocationId = dto.ToLocationId;
+                transferRecord.TransferDate = dto.TransferDate;
+                transferRecord.Status = TransferStatus.Approved; // Directly approve location transfers
 
-                // Determine which action to take based on the transfer type
-                if (dto.FromUserId != dto.ToUserId && dto.FromLocationId != dto.ToLocationId)
-                {
-                    // Both user and location are changing
-                    await HandleUserAndLocationTransferAsync(dto, transferRecord, transferRecord.Asset);
-                }
-                else if (dto.FromUserId != dto.ToUserId)
-                {
-                    // Only user is changing
-                    await HandleUserTransferAsync(dto, transferRecord);
-                }
-                else if (dto.FromLocationId != dto.ToLocationId)
-                {
-                    // Only location is changing
-                    await HandleLocationTransferAsync(transferRecord.Asset, transferRecord);
-                }
+                var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == dto.AssetId);
+                asset.LocationId = dto.ToLocationId;
 
+                await UnitOfWork.writeRepository<Asset>().UpdateAsync(asset.Id, asset);
+                await UnitOfWork.writeRepository<AssetTransferRecords>().UpdateAsync(transferRecord.Id, transferRecord);
                 await UnitOfWork.SaveChangeAsync();
                 await UnitOfWork.CommitTransactionAsync();
 
-                return Mapper.Map<GetAssetTransferRecordResponseDTO,AssetTransferRecords>(transferRecord);
+                return Mapper.Map<GetAssetTransferRecordResponseDTO>(transferRecord);
             }
             catch
             {
@@ -177,9 +243,70 @@ namespace AssetsManagementSystem.Services.AssetTransfer
                 throw;
             }
         }
-
         #endregion
 
+        #region Update User to User Transfer
+        public async Task<GetAssetTransferRecordResponseDTO> UpdateUserToUserTransferAsync(int id, UserToUserTransferDTO dto)
+        {
+            var transferRecord = await UnitOfWork.readRepository<AssetTransferRecords>().GetAsync(r => r.Id == id);
+            if (transferRecord == null) throw new KeyNotFoundException("Transfer record not found.");
+
+            ValidateUserTransfer(dto.FromUserId, dto.ToUserId);
+
+            await UnitOfWork.BeginTransactionAsync();
+            try
+            {
+                transferRecord.FromUserId = dto.FromUserId;
+                transferRecord.ToUserId = dto.ToUserId;
+                transferRecord.TransferDate = dto.TransferDate;
+                transferRecord.Status = TransferStatus.Pending; // Pending approval
+
+                await UnitOfWork.writeRepository<AssetTransferRecords>().UpdateAsync(transferRecord.Id, transferRecord);
+                await UnitOfWork.SaveChangeAsync();
+                await UnitOfWork.CommitTransactionAsync();
+
+                return Mapper.Map<GetAssetTransferRecordResponseDTO>(transferRecord);
+            }
+            catch
+            {
+                await UnitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
+        #endregion
+
+        #region Update User and Location Transfer
+        public async Task<GetAssetTransferRecordResponseDTO> UpdateUserAndLocationTransferAsync(int id, UserAndLocationTransferDTO dto)
+        {
+            var transferRecord = await UnitOfWork.readRepository<AssetTransferRecords>().GetAsync(r => r.Id == id);
+            if (transferRecord == null) throw new KeyNotFoundException("Transfer record not found.");
+
+            ValidateUserTransfer(dto.FromUserId, dto.ToUserId);
+            ValidateLocationTransfer(dto.FromLocationId, dto.ToLocationId);
+
+            await UnitOfWork.BeginTransactionAsync();
+            try
+            {
+                transferRecord.FromUserId = dto.FromUserId;
+                transferRecord.ToUserId = dto.ToUserId;
+                transferRecord.FromLocationId = dto.FromLocationId;
+                transferRecord.ToLocationId = dto.ToLocationId;
+                transferRecord.TransferDate = dto.TransferDate;
+                transferRecord.Status = TransferStatus.Pending; // Pending approval
+
+                await UnitOfWork.writeRepository<AssetTransferRecords>().UpdateAsync(transferRecord.Id, transferRecord);
+                await UnitOfWork.SaveChangeAsync();
+                await UnitOfWork.CommitTransactionAsync();
+
+                return Mapper.Map<GetAssetTransferRecordResponseDTO>(transferRecord);
+            }
+            catch
+            {
+                await UnitOfWork.RollbackTransactionAsync();
+                throw;
+            }
+        }
+        #endregion
 
         #region Delete Asset Transfer Record
         public async Task DeleteAssetTransferAsync(int id)
@@ -202,89 +329,20 @@ namespace AssetsManagementSystem.Services.AssetTransfer
         }
         #endregion
 
-
-        #region Get Asset Transfer Record by ID
-        public async Task<GetAssetTransferRecordResponseDTO> GetAssetTransferByIdAsync(int id)
-        {
-            var transferRecord = await UnitOfWork.readRepository<AssetTransferRecords>().GetAsync(tr => tr.Id == id);
-            if (transferRecord == null) throw new KeyNotFoundException("Transfer record not found.");
-
-            return Mapper.Map<GetAssetTransferRecordResponseDTO,AssetTransferRecords>(transferRecord);
-        }
-        #endregion
-
-
-        #region Get All Asset Transfer Records
-        public async Task<IList<GetAssetTransferRecordResponseDTO>> GetAllAssetTransfersAsync()
-        {
-            var transferRecords = await UnitOfWork.readRepository<AssetTransferRecords>().GetAllAsync();
-            return Mapper.Map<GetAssetTransferRecordResponseDTO,AssetTransferRecords>(transferRecords);
-        }
-        #endregion
-
         #region Private Methods
 
-        private void ValidateTransfer(AddAssetTransferRecordRequestDTO dto)
+        private void ValidateLocationTransfer(int fromLocationId, int toLocationId)
         {
-            if (dto.FromUserId == dto.ToUserId)
-                throw new InvalidOperationException("Cannot transfer asset to the same user.");
-            if (dto.FromLocationId == dto.ToLocationId)
+            if (fromLocationId == toLocationId)
                 throw new InvalidOperationException("Cannot transfer asset to the same location.");
         }
 
-        private void UpdateTransferRecordFields(AssetTransferRecords transferRecord, UpdateAssetTransferRecordRequestDTO dto)
+        private void ValidateUserTransfer(Guid fromUserId, Guid toUserId)
         {
-            transferRecord.FromUserId = dto.FromUserId;
-            transferRecord.ToUserId = dto.ToUserId;
-            transferRecord.FromLocationId = dto.FromLocationId;
-            transferRecord.ToLocationId = dto.ToLocationId;
-            transferRecord.TransferDate = dto.TransferDate;
-            transferRecord.Status = dto.Status;
-            transferRecord.RejectionReason = dto.RejectionReason;
-        }
-
-        private async Task HandleUserTransferAsync(AddAssetTransferRecordRequestDTO dto, AssetTransferRecords transferRecord)
-        {
-            var toUser = await _userManager.FindByIdAsync(dto.ToUserId.ToString());
-            if (toUser == null || toUser.UserStatus != UserStatus.Active.ToString())
-            {
-                throw new InvalidOperationException("Cannot transfer asset to the selected user.");
-            }
-
-            // Await user's approval
-            transferRecord.Status = TransferStatus.Pending;
-        }
-
-        private async Task HandleLocationTransferAsync(Asset asset, AssetTransferRecords transferRecord)
-        {
-            transferRecord.Status = TransferStatus.Approved;
-            await UpdateAssetLocationAsync(asset.Id, transferRecord.ToLocationId);
-        }
-
-        private async Task HandleUserAndLocationTransferAsync(AddAssetTransferRecordRequestDTO dto, AssetTransferRecords transferRecord, Asset asset)
-        {
-            // Handle user transfer first (await approval)
-            await HandleUserTransferAsync(dto, transferRecord);
-
-            // Once approved, handle location transfer
-            if (transferRecord.Status == TransferStatus.Approved)
-            {
-                await HandleLocationTransferAsync(asset, transferRecord);
-            }
-        }
-
-        private async Task UpdateAssetLocationAsync(int assetId, int newLocationId)
-        {
-            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == assetId);
-            if (asset == null) throw new KeyNotFoundException("Asset not found.");
-
-            asset.LocationId = newLocationId;
-            await UnitOfWork.writeRepository<Asset>().UpdateAsync(asset.Id, asset);
+            if (fromUserId == toUserId)
+                throw new InvalidOperationException("Cannot transfer asset to the same user.");
         }
 
         #endregion
-
-
-
     }
 }

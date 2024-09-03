@@ -46,7 +46,8 @@ namespace AssetsManagementSystem.Services.Categories
                 throw new ArgumentException("Invalid category ID.");
             }
 
-            var category = await UnitOfWork.readRepository<Category>().GetAsync(c => c.Id == categoryId);
+            var category = await UnitOfWork.readRepository<Category>()
+                .GetAsync(c => c.Id == categoryId && (c.IsDeleted == false || c.IsDeleted == null));
 
             var getCategoryRequestDTO = Mapper.Map<GetCategoryRequestDTO,Category>(category);
 
@@ -63,7 +64,8 @@ namespace AssetsManagementSystem.Services.Categories
         #region Retrieve all categories
         public async Task<IEnumerable<GetCategoryRequestDTO>> GetAllCategoriesAsync()
         {
-            var categories= await UnitOfWork.readRepository<Category>().GetAllAsync();
+            var categories= await UnitOfWork.readRepository<Category>()
+                .GetAllAsync(predicate: c=> (c.IsDeleted == false || c.IsDeleted == null));
 
             var getCategoryRequestDTOs = Mapper.Map<GetCategoryRequestDTO, Category>(categories);
 
@@ -117,14 +119,29 @@ namespace AssetsManagementSystem.Services.Categories
                 throw new ArgumentException("Invalid category ID.");
             }
 
-            var category = await UnitOfWork.readRepository<Category>().GetAsync(c => c.Id == categoryId);
+            var category = await UnitOfWork.readRepository<Category>()
+                                .GetAsync(c => c.Id == categoryId && (c.IsDeleted == false || c.IsDeleted == null) );
 
-            
+            var subcategory= await UnitOfWork.readRepository<Models.DbSets.SubCategory>()
+                                .GetAsync(sc=>sc.MainCategoryId==categoryId && (sc.IsDeleted == false || sc.IsDeleted == null));
+
+            if (subcategory is not null)
+            {
+                throw new InvalidOperationException("There are Subcategory dependent on this Category,Please Go and delete it first");
+            }
+
+
+            var asset = await UnitOfWork.readRepository<Asset>()
+                               .GetAsync(A => A.SubCategoryId == categoryId && (A.IsDeleted == false || A.IsDeleted == null));
+
+            if (asset is not null)
+            {
+                throw new InvalidOperationException("There are Assets dependent on this Category,Please Go and delete it first");
+            }
              
             category.IsDeleted = true;
             category.DeletedDate = DateTime.Now;
-            //category.AddedOnDate = category.AddedOnDate;
-            //category.UpdatedDate = category.AddedOnDate;
+       
 
              await UnitOfWork.writeRepository<Category>().UpdateAsync(categoryId,category);
              await UnitOfWork.SaveChangeAsync();

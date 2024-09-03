@@ -2,8 +2,7 @@
 {
     public class Document:BaseWithAuditEntity
     {
-        public int Id { get; set; }
-
+ 
         [Required(ErrorMessage = "Document title is required.")]
         [MaxLength(200, ErrorMessage = "Title cannot exceed 200 characters.")]
         [MinLength(3,ErrorMessage = "Tittle cannot be less than 3 characters.")]
