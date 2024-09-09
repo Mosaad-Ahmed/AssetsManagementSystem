@@ -13,8 +13,10 @@ namespace AssetsManagementSystem.Data.Repository.Repositories
 
         private DbSet<T> table => dbContext.Set<T>();
         public async Task AddAsync(T entity)
-        {
+        { 
+ 
             await table.AddAsync(entity);
+           
         }
 
         public async Task AddRangeAsync(IList<T> entities)
@@ -24,6 +26,8 @@ namespace AssetsManagementSystem.Data.Repository.Repositories
         public async Task<T> UpdateAsync(int id, T entity)
         {
             await Task.Run(() => table.Update(entity));
+            dbContext.Entry(entity).State = EntityState.Modified;
+
             return entity;
         }
         public async Task DeleteAsync(T entity)

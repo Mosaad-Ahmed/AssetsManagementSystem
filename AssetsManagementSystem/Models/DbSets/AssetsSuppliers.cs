@@ -1,9 +1,10 @@
 ﻿namespace AssetsManagementSystem.Models.DbSets
 {
+  
     public class AssetsSuppliers:IBaseEntityForGeneric
     {
 
-        public int ID { get; set; }
+         //public int ID { get; set; }
 
         [ForeignKey("Asset")]
         public int AssetId { get; set; }

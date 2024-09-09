@@ -11,7 +11,7 @@
         {
             _assetService = assetService;
             _logger = logger;
-        }
+         }
 
         #region Add Asset
         [HttpPost]

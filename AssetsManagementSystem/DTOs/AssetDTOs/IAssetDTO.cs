@@ -1,11 +1,9 @@
 ﻿using Newtonsoft.Json.Converters;
-using System.Drawing;
 
 namespace AssetsManagementSystem.DTOs.AssetDTOs
 {
-    public class AddAssetRequestDTO:IAssetDTO
+    public interface IAssetDTO
     {
-
         [Required(ErrorMessage = "Asset name is required.")]
         [MaxLength(100, ErrorMessage = "Asset name cannot exceed 100 characters.")]
         public string Name { get; set; }
@@ -17,18 +15,8 @@ namespace AssetsManagementSystem.DTOs.AssetDTOs
         public string ModelNumber { get; set; }
 
 
-
-        [Required(ErrorMessage = "Serial number is required.")]
-        [MaxLength(100, ErrorMessage = "Serial number cannot exceed 100 characters.")]
-        public string SerialNumber { get; set; }
-
-        [MaxLength(1000, ErrorMessage = "Model number cannot exceed 50 characters.")]
-        public string? dicription { get; set; }
-
         [Required(ErrorMessage = "Purchase date is required.")]
-        [DataType(DataType.Date, ErrorMessage = "A7A.")]//Invalid date format
-        [PastOrPresentDate(ErrorMessage = "Purchase date cannot be in the future.")]
-
+        [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
         public DateOnly PurchaseDate { get; set; }
 
 
@@ -40,7 +28,6 @@ namespace AssetsManagementSystem.DTOs.AssetDTOs
 
 
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
-        [FutureDate("PurchaseDate", ErrorMessage = "Warranty expiry date must be after the purchase date.")]
         public DateOnly? WarrantyExpiryDate { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -70,6 +57,5 @@ namespace AssetsManagementSystem.DTOs.AssetDTOs
 
 
         public ICollection<int> SupplierIds { get; set; }
-
     }
 }

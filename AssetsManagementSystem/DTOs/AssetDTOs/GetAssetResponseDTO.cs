@@ -6,9 +6,10 @@
         public string Name { get; set; }
         public string ModelNumber { get; set; }
         public string SerialNumber { get; set; }
-        public DateTime PurchaseDate { get; set; }
+        public string? dicription { get; set; }
+        public DateOnly PurchaseDate { get; set; }
         public decimal PurchasePrice { get; set; }
-        public DateTime? WarrantyExpiryDate { get; set; }
+        public DateOnly? WarrantyExpiryDate { get; set; }
         public string Status { get; set; }
         public string LocationName { get; set; }
         public string AssignedUserName { get; set; }

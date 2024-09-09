@@ -5,9 +5,6 @@
         [Required(ErrorMessage = "Asset name is required.")]
         [MaxLength(100, ErrorMessage = "Asset name cannot exceed 100 characters.")]
         public string Name { get; set; }
-
-        //[Required(ErrorMessage = "Asset type is required.")]
-        //public string Type { get; set; }
          
         [Required(ErrorMessage = "Model number is required.")]
         [MaxLength(50, ErrorMessage = "Model number cannot exceed 50 characters.")]
@@ -15,14 +12,14 @@
 
 
         [Required(ErrorMessage = "Serial number is required.")]
-        [MaxLength(100, ErrorMessage = "Serial number cannot exceed 100 characters.")]
+        [MaxLength(100, ErrorMessage = "Serial number cannot exceed 100 characters.")]  
         public string SerialNumber { get; set; }
 
 
         [Required(ErrorMessage = "Purchase date is required.")]
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
         [PastOrPresentDate(ErrorMessage = "Purchase date cannot be in the future.")]
-        public DateTime PurchaseDate { get; set; }
+        public DateOnly PurchaseDate { get; set; }
 
 
         [Required(ErrorMessage = "Purchase price is required.")]
@@ -31,11 +28,14 @@
 
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
         [FutureDate("PurchaseDate", ErrorMessage = "Warranty expiry date must be after the purchase date.")]
-        public DateTime? WarrantyExpiryDate { get; set; }
+        public DateOnly? WarrantyExpiryDate { get; set; }
 
 
         [Required(ErrorMessage = "Asset status is required.")]
         public string Status { get; set; }
+
+        [MaxLength(1000, ErrorMessage = "Model number cannot exceed 50 characters.")]
+        public string? dicription { get; set; }
 
 
         [Required(ErrorMessage = "Location is required.")]
@@ -60,10 +60,12 @@
         public int SubCategoryId { get; set; }
         public virtual SubCategory AssetSubCategory { get; set; }
 
+        [ForeignKey("Manufacturer")]
+        public int ManufacturerId { get; set; }
+        public virtual Manufacturer  Manufacturer { get; set; }
 
         public virtual ICollection<AssetsSuppliers> AssetsSuppliers { get; set; }  
         public virtual ICollection<Document> Documents { get; set; }   
-        public virtual ICollection<AssetLifecycle> LifecycleEvents { get; set; }   
         public virtual ICollection<AssetDisposalRecord> AssetDisposalRecords { set; get; }
         public virtual ICollection<AssetMaintenanceRecords> AssetMaintenanceRecords { set; get; }
         public virtual ICollection<AssetTransferRecords>  AssetTransferRecords { set; get; }

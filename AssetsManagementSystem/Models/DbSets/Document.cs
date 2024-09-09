@@ -25,5 +25,7 @@
         [Required(ErrorMessage = "Asset ID is required.")]
          public int AssetId { get; set; }
         public virtual Asset Asset { get; set; }
+
+
     }
 }

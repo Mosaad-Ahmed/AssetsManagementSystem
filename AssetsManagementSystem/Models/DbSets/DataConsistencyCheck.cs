@@ -8,7 +8,7 @@
         [Required(ErrorMessage = "Check date is required.")]
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
         [PastOrPresentDate(ErrorMessage = "Check date cannot be in the future.")]
-        public DateTime CheckDate { get; set; }
+        public DateOnly CheckDate { get; set; }
 
 
         [ForeignKey("PerformedBy")]

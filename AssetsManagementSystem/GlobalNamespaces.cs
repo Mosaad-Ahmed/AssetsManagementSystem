@@ -20,9 +20,6 @@ global using Microsoft.IdentityModel.Tokens;
 global using System.Security.Cryptography;
 global using AssetsManagementSystem.Others.Tokens;
 global using Microsoft.AspNetCore.Authentication.JwtBearer;
-global using Microsoft.EntityFrameworkCore.Diagnostics;
-global using Microsoft.EntityFrameworkCore.ChangeTracking;
-global using AssetsManagementSystem.BackgroundServices;
 global using AssetsManagementSystem.Data.UnitOfWorks.UnitOfWork;
 global using AssetsManagementSystem.Models.Commons.Common;
 global using AssetsManagementSystem.Models.Enums;
@@ -50,8 +47,10 @@ global using AssetsManagementSystem.DTOs.AssetDisposalDTOs;
 global using AssetsManagementSystem.Services.AssetDisposal;
 global using AssetsManagementSystem.DTOs.AssetDTOs;
 global using AssetsManagementSystem.Services.Assets;
+global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+global using System.Reflection;
+global using System.Text;
 
- 
 
 
 

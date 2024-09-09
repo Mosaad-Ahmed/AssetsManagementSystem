@@ -8,11 +8,13 @@ namespace AssetsManagementSystem.Data.Configurations
         {
             builder.HasOne(s => s.Supplier)
                  .WithMany(As => As.AssetsSuppliers)
-                 .HasForeignKey(fk=>fk.SupplierId);
+                 .HasForeignKey(fk => fk.SupplierId);
 
             builder.HasOne(s => s.Asset)
                     .WithMany(As => As.AssetsSuppliers)
                     .HasForeignKey(fk => fk.AssetId);
+
+            builder.HasKey(PK => new { PK.SupplierId,PK.AssetId });
 
         }
     }

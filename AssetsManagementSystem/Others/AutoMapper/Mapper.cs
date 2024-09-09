@@ -39,20 +39,38 @@
             var typePair = new TypePair(typeof(TSource), typeof(TDestionation));
 
             if (typePairs.Any(a => a.DestinationType == typePair.DestinationType && a.SourceType == typePair.SourceType) && ignore is null)
-                return;
+            {
+                 return;
+            }
 
-            typePairs.Add(typePair);
+             if (!typePairs.Any(a => a.SourceType == typePair.SourceType && a.DestinationType == typePair.DestinationType))
+            {
+                typePairs.Add(typePair);
+            }
+           // typePairs.Add(typePair);
 
+            // إعداد الـ MapperConfiguration مع التعامل مع الـ ignore لو موجود
             var config = new MapperConfiguration(cfg =>
             {
                 foreach (var item in typePairs)
                 {
+                    // لو ignore موجود، بنستخدمه لتجاهل حقل معين
                     if (ignore is not null)
-                        cfg.CreateMap(item.SourceType, item.DestinationType).MaxDepth(depth).ForMember(ignore, x => x.Ignore()).ReverseMap();
+                    {
+                        cfg.CreateMap(item.SourceType, item.DestinationType)
+                           .MaxDepth(depth)
+                           .ForMember(ignore, x => x.Ignore())
+                           .ReverseMap();
+                    }
                     else
-                        cfg.CreateMap(item.SourceType, item.DestinationType).MaxDepth(depth).ReverseMap();
+                    {
+                        cfg.CreateMap(item.SourceType, item.DestinationType)
+                           .MaxDepth(depth)
+                           .ReverseMap();
+                    }
                 }
             });
+
 
             MapperContainer = config.CreateMapper();
         }

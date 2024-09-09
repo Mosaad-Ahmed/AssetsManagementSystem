@@ -21,6 +21,7 @@ namespace AssetsManagementSystem.Controllers
         #region AddNewUser
 
         [HttpPost("AddUser")]
+        [Authorize(Roles ="Manager,Admin")]
          public async Task<IActionResult> AddUser([FromForm] AddUserRequestDTO registrationRequest)
         {
             if (!ModelState.IsValid)

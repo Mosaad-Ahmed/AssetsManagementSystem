@@ -12,7 +12,7 @@ namespace AssetsManagementSystem.Controllers
             _assetDisposalService = assetDisposalService;
         }
 
-        [Authorize(Roles = "Manager, Admin")]
+        //[Authorize(Roles = "Manager, Admin")]
         [HttpPost("AddDisposalRecord")]
         public async Task<IActionResult> AddAssetDisposalRecord([FromBody] AddAssetDisposalRecordDTO disposalDto)
         {
@@ -78,9 +78,9 @@ namespace AssetsManagementSystem.Controllers
         }
 
 
-        [Authorize(Roles = "Manager, Admin")]
+        //[Authorize(Roles = "Manager, Admin")]
         [HttpPut("UpdateDisposalRecord")]
-        public async Task<IActionResult> UpdateAssetDisposalRecord([FromBody] UpdateAssetDisposalRecordDTO disposalDto)
+        public async Task<IActionResult> UpdateAssetDisposalRecord([FromForm] UpdateAssetDisposalRecordDTO disposalDto)
         {
             if (!ModelState.IsValid)
             {
@@ -103,7 +103,7 @@ namespace AssetsManagementSystem.Controllers
         }
 
 
-        [Authorize(Roles = "Manager, Admin")]
+        //[Authorize(Roles = "Manager, Admin")]
         [HttpDelete("DeleteDisposalRecord/{disposalRecordId}")]
         public async Task<IActionResult> DeleteAssetDisposalRecord(int disposalRecordId)
         {
@@ -121,10 +121,7 @@ namespace AssetsManagementSystem.Controllers
                 return StatusCode(500, new { message = "An unexpected error occurred. Please try again later." });
             }
         }
-
-
-
-      
+         
     }
 }
 

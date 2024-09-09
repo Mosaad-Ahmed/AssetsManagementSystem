@@ -18,14 +18,14 @@
         public int ToLocationId { get; set; }
         public string ToLocationName { get; set; }   
 
-        public DateTime TransferDate { get; set; }
-        public TransferStatus Status { get; set; }
+         public string Status { get; set; }
         public DateTime? ApprovalDate { get; set; }
         public string RejectionReason { get; set; }
 
         public DateTime AddedOnDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
-        public DateTime? DeletedDate { get; set; }
-        public bool? IsDeleted { get; set; }
+        public bool IsUserTransfer { get; set; }
+
     }
 }
+ 

@@ -7,14 +7,13 @@ namespace AssetsManagementSystem.Data.UnitOfWorks.UnitOfWork
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDbContext dbContext;
-       // private readonly AssetLifecycleInterceptor assetLifecycleInterceptor;
+
         private IDbContextTransaction contextTransaction;
 
-        public UnitOfWork(ApplicationDbContext dbContext)//,AssetLifecycleInterceptor assetLifecycleInterceptor)
+        public UnitOfWork(ApplicationDbContext dbContext) 
         {
             this.dbContext = dbContext;
-         //   this.assetLifecycleInterceptor = assetLifecycleInterceptor;
-
+ 
         }
 
 

@@ -62,6 +62,25 @@ namespace AssetsManagementSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AuditLogs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EventType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EntityName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EntityId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Changes = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PerformedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IPAddress = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuditLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -95,6 +114,20 @@ namespace AssetsManagementSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Locations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Manufacturers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Info = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Manufacturers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -221,7 +254,7 @@ namespace AssetsManagementSystem.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    CheckDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CheckDate = table.Column<DateOnly>(type: "date", nullable: false),
                     PerformedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     IssuesFound = table.Column<bool>(type: "bit", nullable: false),
@@ -269,14 +302,16 @@ namespace AssetsManagementSystem.Migrations
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     ModelNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     SerialNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PurchaseDate = table.Column<DateOnly>(type: "date", nullable: false),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    WarrantyExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    WarrantyExpiryDate = table.Column<DateOnly>(type: "date", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    dicription = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     LocationId = table.Column<int>(type: "int", nullable: false),
                     AssignedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
                     SubCategoryId = table.Column<int>(type: "int", nullable: false),
+                    ManufacturerId = table.Column<int>(type: "int", nullable: false),
                     AddedOnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -299,6 +334,11 @@ namespace AssetsManagementSystem.Migrations
                         name: "FK_Assets_Locations_LocationId",
                         column: x => x.LocationId,
                         principalTable: "Locations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Assets_Manufacturers_ManufacturerId",
+                        column: x => x.ManufacturerId,
+                        principalTable: "Manufacturers",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Assets_SubCategory_SubCategoryId",
@@ -338,7 +378,7 @@ namespace AssetsManagementSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AssetLifecycles",
+                name: "AssetLifecycle",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -351,14 +391,14 @@ namespace AssetsManagementSystem.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AssetLifecycles", x => x.Id);
+                    table.PrimaryKey("PK_AssetLifecycle", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AssetLifecycles_AspNetUsers_PerformedById",
+                        name: "FK_AssetLifecycle_AspNetUsers_PerformedById",
                         column: x => x.PerformedById,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_AssetLifecycles_Assets_AssetId",
+                        name: "FK_AssetLifecycle_Assets_AssetId",
                         column: x => x.AssetId,
                         principalTable: "Assets",
                         principalColumn: "Id");
@@ -372,6 +412,9 @@ namespace AssetsManagementSystem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AssetId = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
+                    MaintenanceDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    TOWhomOfUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TOWhomOfSupplierId = table.Column<int>(type: "int", nullable: false),
                     PerformedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     AddedOnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -387,9 +430,19 @@ namespace AssetsManagementSystem.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
+                        name: "FK_AssetMaintenanceRecords_AspNetUsers_TOWhomOfUserId",
+                        column: x => x.TOWhomOfUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_AssetMaintenanceRecords_Assets_AssetId",
                         column: x => x.AssetId,
                         principalTable: "Assets",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AssetMaintenanceRecords_Suppliers_TOWhomOfSupplierId",
+                        column: x => x.TOWhomOfSupplierId,
+                        principalTable: "Suppliers",
                         principalColumn: "Id");
                 });
 
@@ -397,14 +450,12 @@ namespace AssetsManagementSystem.Migrations
                 name: "AssetsSuppliers",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     AssetId = table.Column<int>(type: "int", nullable: false),
                     SupplierId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AssetsSuppliers", x => x.ID);
+                    table.PrimaryKey("PK_AssetsSuppliers", x => new { x.SupplierId, x.AssetId });
                     table.ForeignKey(
                         name: "FK_AssetsSuppliers_Assets_AssetId",
                         column: x => x.AssetId,
@@ -428,9 +479,8 @@ namespace AssetsManagementSystem.Migrations
                     ToUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     FromLocationId = table.Column<int>(type: "int", nullable: false),
                     ToLocationId = table.Column<int>(type: "int", nullable: false),
-                    TransferDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    ApprovalDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ApprovalDate = table.Column<DateOnly>(type: "date", nullable: true),
                     RejectionReason = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     IsUserTransfer = table.Column<bool>(type: "bit", nullable: false),
                     AddedOnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -498,16 +548,64 @@ namespace AssetsManagementSystem.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ReceiveMaintainedAsset",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DateOfRecieve = table.Column<DateOnly>(type: "date", nullable: false),
+                    AssetId = table.Column<int>(type: "int", nullable: false),
+                    UserRecieveDevFromSupplierId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NewUserAssignedId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    NewLocationAssigned = table.Column<int>(type: "int", nullable: false),
+                    DocumentId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReceiveMaintainedAsset", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ReceiveMaintainedAsset_AspNetUsers_NewUserAssignedId",
+                        column: x => x.NewUserAssignedId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ReceiveMaintainedAsset_AspNetUsers_UserRecieveDevFromSupplierId",
+                        column: x => x.UserRecieveDevFromSupplierId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ReceiveMaintainedAsset_Assets_AssetId",
+                        column: x => x.AssetId,
+                        principalTable: "Assets",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ReceiveMaintainedAsset_Documents_DocumentId",
+                        column: x => x.DocumentId,
+                        principalTable: "Documents",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_ReceiveMaintainedAsset_Locations_NewLocationAssigned",
+                        column: x => x.NewLocationAssigned,
+                        principalTable: "Locations",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("62474474-f91b-483d-b0d8-2742c01146f0"), "98429fcd-66c4-4064-89e6-e6ae25da44e2", "Auditor", "AUDITOR" },
-                    { new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"), "8da190b5-8576-4f13-ae67-83eac8b7dc50", "User", "USER" },
-                    { new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"), "55c967f4-843a-43da-ae8b-d3ee858b856e", "Manager", "MANAGER" },
-                    { new Guid("fc05f613-0e97-444e-b19b-018a223a7484"), "6f553334-2478-4056-985d-0da675e629f0", "Admin", "ADMIN" }
+                    { new Guid("62474474-f91b-483d-b0d8-2742c01146f0"), "7f5fff95-4605-4372-af4c-766da18b28a3", "Auditor", "AUDITOR" },
+                    { new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"), "e6aa27c7-0ba3-497d-a55c-485a2f336648", "User", "USER" },
+                    { new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"), "d8144591-fa5d-4c3e-aea5-ba4acbe7b4e5", "Manager", "MANAGER" },
+                    { new Guid("fc05f613-0e97-444e-b19b-018a223a7484"), "39908f50-c114-40b5-863a-d5e98ab9084e", "Admin", "ADMIN" }
                 });
+
+            migrationBuilder.InsertData(
+                table: "AspNetUsers",
+                columns: new[] { "Id", "AccessFailedCount", "AddedOnDate", "ConcurrencyStamp", "DeletedDate", "Email", "EmailConfirmed", "FirstName", "IsDeleted", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedDate", "UserName", "UserStatus" },
+                values: new object[] { new Guid("bdabcf06-a956-4ef7-8045-3214e68b9b4c"), 0, new DateTime(2024, 9, 8, 13, 46, 52, 328, DateTimeKind.Local).AddTicks(6591), "401defa2-55ac-4ed2-8a00-9d6c9f5866e7", null, "Mosaad_Ahmed@Gmail.com", false, "Mosaad", null, "Ahmed", false, null, "MOSAAD_AHMED@GMAIL.COM", "MOSAAD_AHMED@GMAIL.COM", "AQAAAAIAAYagAAAAEFBhFG9V4nVZGA781pXht2La2eoviv9P+qUuM9hOnfBmLAfuy22i10mg31kNF7z3Hg==", "01551251116", false, null, null, "2274a184-e6a8-4e64-a8c3-5a59caac7ff0", false, null, "Mosaad_Ahmed@Gmail.com", "Active" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -559,13 +657,13 @@ namespace AssetsManagementSystem.Migrations
                 column: "AssetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AssetLifecycles_AssetId",
-                table: "AssetLifecycles",
+                name: "IX_AssetLifecycle_AssetId",
+                table: "AssetLifecycle",
                 column: "AssetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AssetLifecycles_PerformedById",
-                table: "AssetLifecycles",
+                name: "IX_AssetLifecycle_PerformedById",
+                table: "AssetLifecycle",
                 column: "PerformedById");
 
             migrationBuilder.CreateIndex(
@@ -577,6 +675,16 @@ namespace AssetsManagementSystem.Migrations
                 name: "IX_AssetMaintenanceRecords_PerformedById",
                 table: "AssetMaintenanceRecords",
                 column: "PerformedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssetMaintenanceRecords_TOWhomOfSupplierId",
+                table: "AssetMaintenanceRecords",
+                column: "TOWhomOfSupplierId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AssetMaintenanceRecords_TOWhomOfUserId",
+                table: "AssetMaintenanceRecords",
+                column: "TOWhomOfUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Assets_AssignedUserId",
@@ -594,6 +702,12 @@ namespace AssetsManagementSystem.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Assets_ManufacturerId",
+                table: "Assets",
+                column: "ManufacturerId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Assets_SubCategoryId",
                 table: "Assets",
                 column: "SubCategoryId");
@@ -602,11 +716,6 @@ namespace AssetsManagementSystem.Migrations
                 name: "IX_AssetsSuppliers_AssetId",
                 table: "AssetsSuppliers",
                 column: "AssetId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AssetsSuppliers_SupplierId",
-                table: "AssetsSuppliers",
-                column: "SupplierId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AssetTransferRecords_AssetId",
@@ -649,6 +758,31 @@ namespace AssetsManagementSystem.Migrations
                 column: "UploadedById");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ReceiveMaintainedAsset_AssetId",
+                table: "ReceiveMaintainedAsset",
+                column: "AssetId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceiveMaintainedAsset_DocumentId",
+                table: "ReceiveMaintainedAsset",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceiveMaintainedAsset_NewLocationAssigned",
+                table: "ReceiveMaintainedAsset",
+                column: "NewLocationAssigned");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceiveMaintainedAsset_NewUserAssignedId",
+                table: "ReceiveMaintainedAsset",
+                column: "NewUserAssignedId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ReceiveMaintainedAsset_UserRecieveDevFromSupplierId",
+                table: "ReceiveMaintainedAsset",
+                column: "UserRecieveDevFromSupplierId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubCategory_MainCategoryId",
                 table: "SubCategory",
                 column: "MainCategoryId");
@@ -676,7 +810,7 @@ namespace AssetsManagementSystem.Migrations
                 name: "AssetDisposalRecords");
 
             migrationBuilder.DropTable(
-                name: "AssetLifecycles");
+                name: "AssetLifecycle");
 
             migrationBuilder.DropTable(
                 name: "AssetMaintenanceRecords");
@@ -688,16 +822,22 @@ namespace AssetsManagementSystem.Migrations
                 name: "AssetTransferRecords");
 
             migrationBuilder.DropTable(
+                name: "AuditLogs");
+
+            migrationBuilder.DropTable(
                 name: "DataConsistencyChecks");
 
             migrationBuilder.DropTable(
-                name: "Documents");
+                name: "ReceiveMaintainedAsset");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Suppliers");
+
+            migrationBuilder.DropTable(
+                name: "Documents");
 
             migrationBuilder.DropTable(
                 name: "Assets");
@@ -707,6 +847,9 @@ namespace AssetsManagementSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "Locations");
+
+            migrationBuilder.DropTable(
+                name: "Manufacturers");
 
             migrationBuilder.DropTable(
                 name: "SubCategory");

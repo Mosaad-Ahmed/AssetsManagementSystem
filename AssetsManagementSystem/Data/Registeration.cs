@@ -9,17 +9,14 @@
                 opt =>
                 {
                     opt.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                 
                  }
           );
-
-           // services.AddScoped<AssetLifecycleInterceptor>();
-
-
+             
             services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
             services.AddScoped(typeof(IWriteRepository<>), typeof(WriteRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            //services.AddScoped<AssetLifecycleInterceptor>();
-
+ 
             services.AddIdentityCore<User>(opt =>
             {
                 opt.Password.RequireNonAlphanumeric = false;

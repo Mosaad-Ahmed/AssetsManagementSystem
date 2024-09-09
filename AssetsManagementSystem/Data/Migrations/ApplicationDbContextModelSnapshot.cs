@@ -51,6 +51,9 @@ namespace AssetsManagementSystem.Migrations
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ManufacturerId")
+                        .HasColumnType("int");
+
                     b.Property<string>("ModelNumber")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -61,8 +64,8 @@ namespace AssetsManagementSystem.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime>("PurchaseDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("PurchaseDate")
+                        .HasColumnType("date");
 
                     b.Property<decimal>("PurchasePrice")
                         .HasColumnType("decimal(18,2)");
@@ -82,8 +85,12 @@ namespace AssetsManagementSystem.Migrations
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("WarrantyExpiryDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("WarrantyExpiryDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("dicription")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
 
                     b.HasKey("Id");
 
@@ -92,6 +99,9 @@ namespace AssetsManagementSystem.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("ManufacturerId")
+                        .IsUnique();
 
                     b.HasIndex("SubCategoryId");
 
@@ -174,7 +184,7 @@ namespace AssetsManagementSystem.Migrations
 
                     b.HasIndex("PerformedById");
 
-                    b.ToTable("AssetLifecycles");
+                    b.ToTable("AssetLifecycle");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetMaintenanceRecords", b =>
@@ -202,7 +212,16 @@ namespace AssetsManagementSystem.Migrations
                     b.Property<bool?>("IsDeleted")
                         .HasColumnType("bit");
 
+                    b.Property<DateOnly>("MaintenanceDate")
+                        .HasColumnType("date");
+
                     b.Property<Guid>("PerformedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("TOWhomOfSupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("TOWhomOfUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("UpdatedDate")
@@ -213,6 +232,10 @@ namespace AssetsManagementSystem.Migrations
                     b.HasIndex("AssetId");
 
                     b.HasIndex("PerformedById");
+
+                    b.HasIndex("TOWhomOfSupplierId");
+
+                    b.HasIndex("TOWhomOfUserId");
 
                     b.ToTable("AssetMaintenanceRecords");
                 });
@@ -228,8 +251,8 @@ namespace AssetsManagementSystem.Migrations
                     b.Property<DateTime>("AddedOnDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("ApprovalDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("ApprovalDate")
+                        .HasColumnType("date");
 
                     b.Property<int>("AssetId")
                         .HasColumnType("int");
@@ -253,17 +276,15 @@ namespace AssetsManagementSystem.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ToLocationId")
                         .HasColumnType("int");
 
                     b.Property<Guid>("ToUserId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("TransferDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
@@ -285,25 +306,57 @@ namespace AssetsManagementSystem.Migrations
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetsSuppliers", b =>
                 {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("SupplierId")
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<int>("AssetId")
                         .HasColumnType("int");
 
-                    b.Property<int>("SupplierId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ID");
+                    b.HasKey("SupplierId", "AssetId");
 
                     b.HasIndex("AssetId");
 
-                    b.HasIndex("SupplierId");
-
                     b.ToTable("AssetsSuppliers");
+                });
+
+            modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Changes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EntityName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IPAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PerformedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLogs");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.Category", b =>
@@ -349,8 +402,8 @@ namespace AssetsManagementSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CheckDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("CheckDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -455,6 +508,68 @@ namespace AssetsManagementSystem.Migrations
                     b.ToTable("Locations");
                 });
 
+            modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.Manufacturer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Info")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Manufacturers");
+                });
+
+            modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.ReceiveMaintainedAsset", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssetId")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("DateOfRecieve")
+                        .HasColumnType("date");
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NewLocationAssigned")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("NewUserAssignedId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserRecieveDevFromSupplierId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("NewLocationAssigned");
+
+                    b.HasIndex("NewUserAssignedId");
+
+                    b.HasIndex("UserRecieveDevFromSupplierId");
+
+                    b.ToTable("ReceiveMaintainedAsset");
+                });
+
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.Role", b =>
                 {
                     b.Property<Guid>("Id")
@@ -486,28 +601,28 @@ namespace AssetsManagementSystem.Migrations
                         new
                         {
                             Id = new Guid("fc05f613-0e97-444e-b19b-018a223a7484"),
-                            ConcurrencyStamp = "6f553334-2478-4056-985d-0da675e629f0",
+                            ConcurrencyStamp = "39908f50-c114-40b5-863a-d5e98ab9084e",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"),
-                            ConcurrencyStamp = "8da190b5-8576-4f13-ae67-83eac8b7dc50",
+                            ConcurrencyStamp = "e6aa27c7-0ba3-497d-a55c-485a2f336648",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"),
-                            ConcurrencyStamp = "55c967f4-843a-43da-ae8b-d3ee858b856e",
+                            ConcurrencyStamp = "d8144591-fa5d-4c3e-aea5-ba4acbe7b4e5",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = new Guid("62474474-f91b-483d-b0d8-2742c01146f0"),
-                            ConcurrencyStamp = "98429fcd-66c4-4064-89e6-e6ae25da44e2",
+                            ConcurrencyStamp = "7f5fff95-4605-4372-af4c-766da18b28a3",
                             Name = "Auditor",
                             NormalizedName = "AUDITOR"
                         });
@@ -677,6 +792,29 @@ namespace AssetsManagementSystem.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("bdabcf06-a956-4ef7-8045-3214e68b9b4c"),
+                            AccessFailedCount = 0,
+                            AddedOnDate = new DateTime(2024, 9, 8, 13, 46, 52, 328, DateTimeKind.Local).AddTicks(6591),
+                            ConcurrencyStamp = "401defa2-55ac-4ed2-8a00-9d6c9f5866e7",
+                            Email = "Mosaad_Ahmed@Gmail.com",
+                            EmailConfirmed = false,
+                            FirstName = "Mosaad",
+                            LastName = "Ahmed",
+                            LockoutEnabled = false,
+                            NormalizedEmail = "MOSAAD_AHMED@GMAIL.COM",
+                            NormalizedUserName = "MOSAAD_AHMED@GMAIL.COM",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFBhFG9V4nVZGA781pXht2La2eoviv9P+qUuM9hOnfBmLAfuy22i10mg31kNF7z3Hg==",
+                            PhoneNumber = "01551251116",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "2274a184-e6a8-4e64-a8c3-5a59caac7ff0",
+                            TwoFactorEnabled = false,
+                            UserName = "Mosaad_Ahmed@Gmail.com",
+                            UserStatus = "Active"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -802,6 +940,12 @@ namespace AssetsManagementSystem.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("AssetsManagementSystem.Models.DbSets.Manufacturer", "Manufacturer")
+                        .WithOne("Asset")
+                        .HasForeignKey("AssetsManagementSystem.Models.DbSets.Asset", "ManufacturerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("AssetsManagementSystem.Models.DbSets.SubCategory", "AssetSubCategory")
                         .WithMany("Assets")
                         .HasForeignKey("SubCategoryId")
@@ -815,6 +959,8 @@ namespace AssetsManagementSystem.Migrations
                     b.Navigation("Category");
 
                     b.Navigation("Location");
+
+                    b.Navigation("Manufacturer");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetDisposalRecord", b =>
@@ -869,9 +1015,25 @@ namespace AssetsManagementSystem.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
+                    b.HasOne("AssetsManagementSystem.Models.DbSets.Supplier", "TOWhomOfSupplier")
+                        .WithMany()
+                        .HasForeignKey("TOWhomOfSupplierId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("AssetsManagementSystem.Models.DbSets.User", "TOWhomOfUser")
+                        .WithMany()
+                        .HasForeignKey("TOWhomOfUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.Navigation("Asset");
 
                     b.Navigation("PerformedBy");
+
+                    b.Navigation("TOWhomOfSupplier");
+
+                    b.Navigation("TOWhomOfUser");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetTransferRecords", b =>
@@ -966,6 +1128,49 @@ namespace AssetsManagementSystem.Migrations
                     b.Navigation("UploadedBy");
                 });
 
+            modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.ReceiveMaintainedAsset", b =>
+                {
+                    b.HasOne("AssetsManagementSystem.Models.DbSets.Asset", "Asset")
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("AssetsManagementSystem.Models.DbSets.Document", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("AssetsManagementSystem.Models.DbSets.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("NewLocationAssigned")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("AssetsManagementSystem.Models.DbSets.User", "NewUserAssigned")
+                        .WithMany()
+                        .HasForeignKey("NewUserAssignedId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("AssetsManagementSystem.Models.DbSets.User", "UserRecieveDevFromSupplier")
+                        .WithMany()
+                        .HasForeignKey("UserRecieveDevFromSupplierId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("Document");
+
+                    b.Navigation("Location");
+
+                    b.Navigation("NewUserAssigned");
+
+                    b.Navigation("UserRecieveDevFromSupplier");
+                });
+
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.SubCategory", b =>
                 {
                     b.HasOne("AssetsManagementSystem.Models.DbSets.Category", "MainAssetCategory")
@@ -1051,6 +1256,12 @@ namespace AssetsManagementSystem.Migrations
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.Location", b =>
                 {
                     b.Navigation("Assets");
+                });
+
+            modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.Manufacturer", b =>
+                {
+                    b.Navigation("Asset")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.SubCategory", b =>

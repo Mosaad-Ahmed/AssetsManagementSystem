@@ -17,9 +17,6 @@
         [Required(ErrorMessage = "To Location ID is required.")]
         public int ToLocationId { get; set; }
 
-        [Required(ErrorMessage = "Transfer date is required.")]
-        [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
-        [PastOrPresentDate(ErrorMessage = "Transfer date cannot be in the future.")]
-        public DateTime TransferDate { get; set; }
+        
     }
 }

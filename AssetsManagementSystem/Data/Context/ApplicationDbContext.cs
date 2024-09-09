@@ -1,20 +1,18 @@
-﻿using AssetsManagementSystem.Models.DbSets;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
-
-namespace AssetsManagementSystem.Data.Context
+﻿namespace AssetsManagementSystem.Data.Context
 {
     public class ApplicationDbContext:IdentityDbContext<User,Role,Guid>
     {
-       // private readonly AssetLifecycleInterceptor _assetLifecycleInterceptor;
-
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> optionsBuilder)//, AssetLifecycleInterceptor assetLifecycleInterceptor)
-            : base(optionsBuilder) 
+       // public IHttpContextAccessor HttpContextAccessor { get; }
+        //public string UserId { get; set; }
+       
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> optionsBuilder)//, IHttpContextAccessor httpContextAccessor)
+        : base(optionsBuilder) 
         {
-          // _assetLifecycleInterceptor = assetLifecycleInterceptor;
+        //    HttpContextAccessor = httpContextAccessor;
+          //  UserId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         }
+ 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,11 +28,63 @@ namespace AssetsManagementSystem.Data.Context
 
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-           // optionsBuilder.AddInterceptors(_assetLifecycleInterceptor);
-        }
+     
+
+        ////public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
+        ////{
+        ////    base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        ////    var entries =  ChangeTracker.Entries()
+        ////       .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified ||
+        ////       e.State == EntityState.Deleted).ToList();
+
+        ////    foreach (var entry in entries)
+        ////    {
+        ////        var auditLog = new AuditLog
+        ////        {
+        ////            EventType = entry.State.ToString(),
+        ////            EntityName = entry.Entity.GetType().Name,
+        ////            EntityId  = entry.Properties.FirstOrDefault(p => p.Metadata.IsPrimaryKey())?.CurrentValue?.ToString(),
+        ////            Changes = GetChanges(entry),
+        ////            Timestamp = DateTime.Now,
+        ////            PerformedBy = UserId ?? "System",
+        ////            IPAddress = HttpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString()
+        ////        };
+
+
+        ////       AuditLogs.Add(auditLog);
+        ////    }
+
+ 
+        ////     return base.SaveChangesAsync(acceptAllChangesOnSuccess, cancellationToken);
+        ////}
+
+        //private string GetChanges(EntityEntry entry)
+        //{
+        //    var changes = new StringBuilder();
+
+        //    if (entry.State == EntityState.Added)
+        //    {
+        //        changes.Append("New entity added.");
+        //    }
+        //    else if (entry.State == EntityState.Deleted)
+        //    {
+        //        changes.Append("Entity deleted.");
+        //    }
+        //    else if (entry.State == EntityState.Modified)
+        //    {
+        //        foreach (var property in entry.Properties)
+        //        {
+        //            if (property.IsModified)
+        //            {
+        //                changes.AppendLine($"{property.Metadata.Name}: {property.OriginalValue} -> {property.CurrentValue}");
+        //            }
+        //        }
+        //    }
+
+        //    return changes.ToString();
+        //}
+
+        #region DbSets
         public virtual DbSet<User> users { get; set; }
         public virtual DbSet<Asset> Assets { get; set; }
         public virtual DbSet<AssetDisposalRecord> AssetDisposalRecords { get; set; }
@@ -45,7 +95,9 @@ namespace AssetsManagementSystem.Data.Context
         public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<DataConsistencyCheck> DataConsistencyChecks { get; set; }
         public virtual DbSet<Document> Documents { get; set; }
-        public virtual DbSet<AssetLifecycle> AssetLifecycles { get; set; }
-
+        public virtual DbSet<AuditLog> AuditLogs { get; set; }
+        public virtual DbSet<Manufacturer> Manufacturers { get; set; }
+        public virtual DbSet<ReceiveMaintainedAsset> ReceiveMaintainedAsset { get; set; }
+        #endregion
     }
 }

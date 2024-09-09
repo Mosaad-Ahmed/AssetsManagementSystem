@@ -2,7 +2,9 @@
 {
     public class AssetDisposalService : BaseClassForServices
     {
-        public AssetDisposalService(IUnitOfWork unitOfWork, Others.Interfaces.IAutoMapper.IMapper mapper, IHttpContextAccessor httpContextAccessor) 
+        public AssetDisposalService(IUnitOfWork unitOfWork,
+                 Others.Interfaces.IAutoMapper.IMapper mapper,
+                 IHttpContextAccessor httpContextAccessor) 
             : base(unitOfWork, mapper, httpContextAccessor)
         {
         }
@@ -12,7 +14,9 @@
         {
             //  Verify that the Asset exists and is not already deleted
             var asset = await UnitOfWork.readRepository<Asset>()
-                                         .GetAsync(a => a.Id == disposalDto.AssetId && (a.IsDeleted==false|| a.IsDeleted==null), enableTracing: true);
+                                         .GetAsync(a => a.SerialNumber == disposalDto
+                                         && (a.IsDeleted==false|| a.IsDeleted==null)
+                                         &&a.Status != AssetStatus.Retired.ToString());
             if (asset == null)
             {
                 throw new KeyNotFoundException("Asset not found or has already been deleted.");
@@ -33,7 +37,7 @@
             asset.Status = "Retired";
             asset.IsDeleted = true;
             asset.DeletedDate = DateTime.Now;
-
+            await DeleteAssetSuppliers(asset.Id);
             await UnitOfWork.writeRepository<Asset>().UpdateAsync(asset.Id, asset);
 
             //   Save changes in a transaction
@@ -54,7 +58,7 @@
         public async Task<IList<GetAssetDisposalRecordDTO>> GetAllAssetDisposalRecordsAsync()
         {
             var disposalRecords = await UnitOfWork.readRepository<AssetDisposalRecord>()
-                                                   .GetAllAsync(d => (d.Asset.IsDeleted == false || d.Asset.IsDeleted == null));
+                                                   .GetAllAsync(d => (d.IsDeleted == false || d.IsDeleted == null));
 
             var disposalRecordsDto = disposalRecords.Select(d => new GetAssetDisposalRecordDTO
             {
@@ -75,7 +79,7 @@
         public async Task<GetAssetDisposalRecordDTO> GetAssetDisposalRecordByIdAsync(int disposalRecordId)
         {
             var disposalRecord = await UnitOfWork.readRepository<AssetDisposalRecord>()
-                                                  .GetAsync(d => d.Id == disposalRecordId && (d.Asset.IsDeleted == false || d.Asset.IsDeleted == null));
+                                                  .GetAsync(d => d.Id == disposalRecordId && (d.IsDeleted == false || d.IsDeleted == null));
             if (disposalRecord == null)
             {
                 throw new KeyNotFoundException("Disposal record not found or has been deleted.");
@@ -101,8 +105,9 @@
         {
             //  Verify that the disposal record exists
             var existingRecord = await UnitOfWork.readRepository<AssetDisposalRecord>()
-                                                  .GetAsync(d => d.Id == disposalDto.Id && (d.Asset.IsDeleted==false|| d.Asset.IsDeleted == null),
-                                                  enableTracing: true);
+                                                  .GetAsync(d => d.Id == disposalDto.Id 
+                                                  && (d.IsDeleted==false|| d.IsDeleted == null)
+                                                 );
             if (existingRecord == null)
             {
                 throw new KeyNotFoundException("Disposal record not found or associated asset has been deleted.");
@@ -136,7 +141,7 @@
             //  Verify that the disposal record exists
             var existingRecord = await UnitOfWork.readRepository<AssetDisposalRecord>()
                                                   .GetAsync(d => d.Id == disposalRecordId && 
-                                                  (d.Asset.IsDeleted == false || d.Asset.IsDeleted == null),enableTracing:true);
+                                                  (d.IsDeleted == false || d.IsDeleted == null),enableTracing:true);
             if (existingRecord == null)
             {
                 throw new KeyNotFoundException("Disposal record not found or has already been deleted.");
@@ -158,7 +163,7 @@
             asset.Status = "Active";
             asset.IsDeleted = false;
             asset.DeletedDate = null;
-            asset.UpdatedDate = DateTime.UtcNow;
+            asset.UpdatedDate = DateTime.Now;
 
             await UnitOfWork.writeRepository<Asset>().UpdateAsync(asset.Id, asset);
 
@@ -176,6 +181,19 @@
                 throw new Exception("An error occurred while deleting the disposal record and updating the asset.");
             }
         }
-         
+
+
+
+        #region Delete existing asset-supplier relationships
+        private async Task DeleteAssetSuppliers(int assetId)
+        {
+            var existingAssetSuppliers = await UnitOfWork.readRepository<AssetsSuppliers>()
+                .GetAllAsync(As => As.AssetId == assetId);
+
+            await UnitOfWork.writeRepository<AssetsSuppliers>().DeleteRangeAsync(existingAssetSuppliers);
+            await UnitOfWork.SaveChangeAsync();
+        }
+        #endregion
+
     }
 }

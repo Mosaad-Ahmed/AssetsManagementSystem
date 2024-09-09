@@ -144,29 +144,18 @@ namespace AssetsManagementSystem.Controllers
         #endregion
 
         #region Update Location to Location Transfer
-        [HttpPut("{id}/locationtolocation")]
-        public async Task<IActionResult> UpdateLocationToLocationTransfer(int id, [FromBody] LocationToLocationTransferDTO dto)
+        [HttpGet("GetAssetForCurrentUser")]
+        public async Task<IActionResult> GetAssetForCurrentUser()
         {
-            if (!ModelState.IsValid)
-            {
-                _logger.LogWarning("Invalid model state for UpdateLocationToLocationTransfer.");
-                return BadRequest(ModelState);
-            }
-
             try
             {
-                var result = await _assetTransferService.UpdateLocationToLocationTransferAsync(id, dto);
-                _logger.LogInformation("Asset transfer (location to location) updated successfully.");
+                var result = await _assetTransferService.GetAssetTransferForCurrentUserByIdAsync();
+                _logger.LogInformation("All asset transfers retrieved successfully.");
                 return Ok(result);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogWarning(ex, "Transfer record not found.");
-                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while updating asset transfer (location to location).");
+                _logger.LogError(ex, "Error occurred while retrieving all asset transfers.");
                 return StatusCode(500, "Internal server error.");
             }
         }
@@ -174,7 +163,7 @@ namespace AssetsManagementSystem.Controllers
 
         #region Update User to User Transfer
         [HttpPut("{id}/usertouser")]
-        public async Task<IActionResult> UpdateUserToUserTransfer(int id, [FromBody] UserToUserTransferDTO dto)
+        public async Task<IActionResult> UpdateUserToUserTransfer(int id, [FromBody] UpdateUserToUserTransferDTO dto)
         {
             if (!ModelState.IsValid)
             {
@@ -203,7 +192,7 @@ namespace AssetsManagementSystem.Controllers
 
         #region Update User and Location Transfer
         [HttpPut("{id}/userandlocation")]
-        public async Task<IActionResult> UpdateUserAndLocationTransfer(int id, [FromBody] UserAndLocationTransferDTO dto)
+        public async Task<IActionResult> UpdateUserAndLocationTransfer(int id, [FromBody] UpdateUserAndLocationTransferDTO dto)
         {
             if (!ModelState.IsValid)
             {

@@ -11,22 +11,20 @@
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var currentValue = (DateTime?)value;
             var comparisonProperty = validationContext.ObjectType.GetProperty(_comparisonProperty);
-
             if (comparisonProperty == null)
             {
-                throw new ArgumentException("Property with this name not found");
+                return new ValidationResult($"Unknown property: {_comparisonProperty}");
             }
 
-            var comparisonValue = (DateTime?)comparisonProperty.GetValue(validationContext.ObjectInstance);
+            var comparisonValue = (DateOnly)comparisonProperty.GetValue(validationContext.ObjectInstance);
 
-            if (currentValue.HasValue && comparisonValue.HasValue && currentValue <= comparisonValue)
+            if (value == null || (DateOnly)value > comparisonValue)
             {
-                return new ValidationResult(ErrorMessage);
+                return ValidationResult.Success;
             }
 
-            return ValidationResult.Success;
+            return new ValidationResult(ErrorMessage);
         }
     }
 

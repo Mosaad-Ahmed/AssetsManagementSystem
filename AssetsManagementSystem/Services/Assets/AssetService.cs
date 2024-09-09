@@ -1,8 +1,4 @@
-﻿
-
-using AssetsManagementSystem.Models.DbSets;
-
-namespace AssetsManagementSystem.Services.Assets
+﻿namespace AssetsManagementSystem.Services.Assets
 {
     public class AssetService : BaseClassForServices
     {
@@ -45,7 +41,7 @@ namespace AssetsManagementSystem.Services.Assets
                 throw;
             }
 
-            return Mapper.Map<GetAssetResponseDTO, Asset>(asset);
+            return await GetAssetByIdAsync(asset.Id);
         }
         #endregion
 
@@ -53,7 +49,9 @@ namespace AssetsManagementSystem.Services.Assets
         public async Task<GetAssetResponseDTO> GetAssetByIdAsync(int id)
         {
             var asset = await UnitOfWork.readRepository<Asset>()
-                .GetAsync(a => a.Id == id && (a.IsDeleted == false || a.IsDeleted == null));
+                .GetAsync(a => a.Id == id && 
+                (a.IsDeleted == false || a.IsDeleted == null)&&
+                a.Status!=AssetStatus.Retired.ToString());
 
             if (asset == null)
             {
@@ -68,6 +66,7 @@ namespace AssetsManagementSystem.Services.Assets
                 SerialNumber = asset.SerialNumber,
                 PurchaseDate = asset.PurchaseDate,
                 PurchasePrice = asset.PurchasePrice,
+                dicription=asset.dicription,
                 WarrantyExpiryDate = asset.WarrantyExpiryDate,
                 Status = asset.Status,
                 LocationName = asset.Location.Name,
@@ -101,6 +100,7 @@ namespace AssetsManagementSystem.Services.Assets
                 PurchasePrice = a.PurchasePrice,
                 WarrantyExpiryDate = a.WarrantyExpiryDate,
                 Status = a.Status,
+                dicription = a.dicription,
                 LocationName = a.Location.Name, 
                 AssignedUserName =string.Concat(a.AssignedUser.FirstName," ",a.AssignedUser.LastName),
                 CategoryName = a.Category?.Name, 
@@ -121,20 +121,24 @@ namespace AssetsManagementSystem.Services.Assets
             try
             {
                 var existingAsset = await UnitOfWork.readRepository<Asset>()
-                    .GetAsync(a => a.Id == id && (a.IsDeleted == false || a.IsDeleted == null));
+                    .GetAsync(a => a.Id == id && 
+                    (a.IsDeleted == false || a.IsDeleted == null)&&
+                    a.Status!=AssetStatus.Retired.ToString());
 
                 if (existingAsset == null)
                 {
                     throw new KeyNotFoundException("Asset not found.");
                 }
 
-                var anotherAsset = await UnitOfWork.readRepository<Asset>()
-                    .GetAsync(a => a.SerialNumber == updateAssetDto.SerialNumber && a.Id != id);
+                #region Serial Number Not Updatable
+                //var anotherAsset = await UnitOfWork.readRepository<Asset>()
+                //    .GetAsync(a => a.SerialNumber == updateAssetDto.SerialNumber && a.Id != id);
 
-                if (anotherAsset != null)
-                {
-                    throw new InvalidOperationException("Another asset with the same serial number already exists.");
-                }
+                //if (anotherAsset != null)
+                //{
+                //    throw new InvalidOperationException("Another asset with the same serial number already exists.");
+                //}
+                #endregion
 
                 // Validate foreign keys and category-subcategory relation
                 await ValidateForeignKeysAndCategoryRelationAsync(updateAssetDto);
@@ -142,7 +146,7 @@ namespace AssetsManagementSystem.Services.Assets
                 #region Manually assign properties from the DTO to the existing asset
                 existingAsset.Name = updateAssetDto.Name;
                 existingAsset.ModelNumber = updateAssetDto.ModelNumber;
-                existingAsset.SerialNumber = updateAssetDto.SerialNumber;
+                existingAsset.SerialNumber = existingAsset.SerialNumber;
                 existingAsset.PurchaseDate = updateAssetDto.PurchaseDate;
                 existingAsset.PurchasePrice = updateAssetDto.PurchasePrice;
                 existingAsset.WarrantyExpiryDate = updateAssetDto.WarrantyExpiryDate;
@@ -165,7 +169,7 @@ namespace AssetsManagementSystem.Services.Assets
 
                 await UnitOfWork.CommitTransactionAsync();
 
-                return Mapper.Map<GetAssetResponseDTO, Asset>(existingAsset);
+                return await GetAssetByIdAsync(existingAsset.Id);
             }
             catch
             {
@@ -187,12 +191,14 @@ namespace AssetsManagementSystem.Services.Assets
             }
 
             existingAsset.IsDeleted = true;
-            existingAsset.DeletedDate = DateTime.UtcNow;
+            existingAsset.DeletedDate = DateTime.Now;
+            existingAsset.Status=AssetStatus.Retired.ToString();
 
             await UnitOfWork.BeginTransactionAsync();
             try
             {
                 await UnitOfWork.writeRepository<Asset>().UpdateAsync(id, existingAsset);
+               await DeleteAssetSuppliers (existingAsset.Id);
                 await UnitOfWork.SaveChangeAsync();
                 await UnitOfWork.CommitTransactionAsync();
             }
@@ -235,24 +241,28 @@ namespace AssetsManagementSystem.Services.Assets
         #endregion
 
         #region Validate foreign keys and ensure that the SubCategory belongs to the correct MainCategory
-        private async Task ValidateForeignKeysAndCategoryRelationAsync(AddAssetRequestDTO assetDto)
+        private async Task ValidateForeignKeysAndCategoryRelationAsync(IAssetDTO assetDto)
         {
-            if (await UnitOfWork.readRepository<Location>().GetAsync(l => l.Id == assetDto.LocationId) == null)
+            if (await UnitOfWork.readRepository<Location>().GetAsync(l => l.Id == assetDto.LocationId 
+            && (l.IsDeleted == false || l.IsDeleted==null)) == null)
             {
                 throw new KeyNotFoundException("Location not found.");
             }
 
-            if (await UnitOfWork.readRepository<User>().GetAsync(u => u.Id == assetDto.AssignedUserId) == null)
+            if (await UnitOfWork.readRepository<User>().GetAsync(u => u.Id == assetDto.AssignedUserId
+            && (u.IsDeleted == false || u.IsDeleted == null)) == null)
             {
                 throw new KeyNotFoundException("Assigned user not found.");
             }
 
-            if (await UnitOfWork.readRepository<Category>().GetAsync(c => c.Id == assetDto.CategoryId) == null)
+            if (await UnitOfWork.readRepository<Category>().GetAsync(c => c.Id == assetDto.CategoryId
+            && (c.IsDeleted == false || c.IsDeleted == null)) == null)
             {
                 throw new KeyNotFoundException("Category not found.");
             }
 
-            var subCategory = await UnitOfWork.readRepository<Models.DbSets.SubCategory>().GetAsync(sc => sc.Id == assetDto.SubCategoryId);
+            var subCategory = await UnitOfWork.readRepository<Models.DbSets.SubCategory>().GetAsync(sc => sc.Id == assetDto.SubCategoryId
+            && (sc.IsDeleted == false || sc.IsDeleted == null));
             if (subCategory == null)
             {
                 throw new KeyNotFoundException("SubCategory not found.");
@@ -265,7 +275,8 @@ namespace AssetsManagementSystem.Services.Assets
 
             foreach (var supplierId in assetDto.SupplierIds)
             {
-                if (await UnitOfWork.readRepository<Supplier>().GetAsync(s => s.Id == supplierId) == null)
+                if (await UnitOfWork.readRepository<Supplier>().GetAsync(s => s.Id == supplierId 
+                && (s.IsDeleted == false || s.IsDeleted == null)) == null)
                 {
                     throw new KeyNotFoundException($"Supplier with ID {supplierId} not found.");
                 }

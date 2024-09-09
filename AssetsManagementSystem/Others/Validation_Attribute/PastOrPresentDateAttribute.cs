@@ -4,11 +4,13 @@
     {
         public override bool IsValid(object value)
         {
-            if (value is DateTime dateValue)
+            if (value == null) return true;
+
+            if (value is DateOnly dateValue)
             {
-                return dateValue <= DateTime.Today;
+                return dateValue <= DateOnly.FromDateTime(DateTime.Now);  
             }
-            return true;
+            return false;
         }
     }
 

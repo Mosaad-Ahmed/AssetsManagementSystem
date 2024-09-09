@@ -120,31 +120,32 @@ namespace AssetsManagementSystem.Controllers
             }
         }
 
-        [HttpDelete("DeleteMaintenanceRecord/{maintenanceRecordId}")]
-        public async Task<IActionResult> DeleteMaintenanceRecord(int maintenanceRecordId)
-        {
-            try
-            {
-                _logger.LogInformation("Attempting to delete maintenance record ID {MaintenanceRecordId}", maintenanceRecordId);
+        #region
+        //[HttpDelete("DeleteMaintenanceRecord/{maintenanceRecordId}")]
+        //public async Task<IActionResult> DeleteMaintenanceRecord(int maintenanceRecordId)
+        //{
+        //    try
+        //    {
+        //        _logger.LogInformation("Attempting to delete maintenance record ID {MaintenanceRecordId}", maintenanceRecordId);
 
-                await _assetMaintenanceService.DeleteMaintenanceRecordAsync(maintenanceRecordId);
+        //        await _assetMaintenanceService.DeleteMaintenanceRecordAsync(maintenanceRecordId);
 
-                _logger.LogInformation("Successfully deleted maintenance record ID {MaintenanceRecordId}", maintenanceRecordId);
+        //        _logger.LogInformation("Successfully deleted maintenance record ID {MaintenanceRecordId}", maintenanceRecordId);
 
-                return Ok(new { message = "Maintenance record deleted successfully." });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogWarning(ex, "Failed to delete maintenance record: {Message}", ex.Message);
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while deleting the maintenance record ID {MaintenanceRecordId}", maintenanceRecordId);
-                return StatusCode(500, new { message = "An unexpected error occurred. Please try again later." });
-            }
-        }
-
+        //        return Ok(new { message = "Maintenance record deleted successfully." });
+        //    }
+        //    catch (KeyNotFoundException ex)
+        //    {
+        //        _logger.LogWarning(ex, "Failed to delete maintenance record: {Message}", ex.Message);
+        //        return NotFound(new { message = ex.Message });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An error occurred while deleting the maintenance record ID {MaintenanceRecordId}", maintenanceRecordId);
+        //        return StatusCode(500, new { message = "An unexpected error occurred. Please try again later." });
+        //    }
+        //}
+        #endregion
 
     }
 }

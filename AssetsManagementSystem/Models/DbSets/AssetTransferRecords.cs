@@ -34,26 +34,24 @@
         public virtual Location ToLocation { get; set; }
 
 
-        [Required(ErrorMessage = "Transfer date is required.")]
-        [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
-        [PastOrPresentDate(ErrorMessage = "Transfer date cannot be in the future.")]
-        public DateTime TransferDate { get; set; }
+        //[Required(ErrorMessage = "Transfer date is required.")]
+        //[DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
+        //[PastOrPresentDate(ErrorMessage = "Transfer date cannot be in the future.")]
+        //public DateTime TransferDate { get; set; }
 
 
 
         [Required(ErrorMessage = "Transfer status is required.")]
-        public TransferStatus Status { get; set; }
+        public string Status { get; set; }
 
 
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
         [PastOrPresentDate(ErrorMessage = "Approval date cannot be in the future.")]
-        public DateTime? ApprovalDate { get; set; }
+        public DateOnly? ApprovalDate { get; set; }
 
 
         [MaxLength(1000, ErrorMessage = "Rejection reason cannot exceed 1000 characters.")]
         public string? RejectionReason { get; set; }
-
-
         public bool IsUserTransfer { get; set; }
 
     }

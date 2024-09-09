@@ -8,7 +8,7 @@
         [Required(ErrorMessage = "Disposal date is required.")]
         [DataType(System.ComponentModel.DataAnnotations.DataType.Date, ErrorMessage = "Invalid date format.")]
         [PastOrPresentDate(ErrorMessage = "Disposal date cannot be in the future.")]
-        public DateTime DisposalDate { get; set; }
+        public DateOnly DisposalDate { get; set; }
 
         [Required(ErrorMessage = "Reason for disposal is required.")]
         [MaxLength(500, ErrorMessage = "Reason cannot exceed 500 characters.")]

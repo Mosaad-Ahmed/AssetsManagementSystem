@@ -114,11 +114,11 @@ namespace AssetsManagementSystem.Services.Suppliers
         {
             var supplierDTO = await GetSupplierByIdAsync(supplierId);
 
-            var asset= await UnitOfWork.readRepository<Asset>()
-                .GetAsync(predicate:a=>a.AssetsSuppliers.Any(As=>As.SupplierId==supplierId));
+            var asset = await UnitOfWork.readRepository<Asset>()
+                .GetAsync(predicate: a => a.AssetsSuppliers.Any(As => As.SupplierId == supplierId));
             if (asset is not null)
                 throw new InvalidOperationException("There are suppliers dependent on this supplier,Please Go and delete it first");
-                 
+
             var supplier = Mapper.Map<Supplier, GetSupplierRequestDTO>(supplierDTO);
 
 
