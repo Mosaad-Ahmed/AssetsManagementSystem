@@ -50,6 +50,15 @@ global using AssetsManagementSystem.Services.Assets;
 global using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 global using System.Reflection;
 global using System.Text;
+global using AssetsManagementSystem.Services.AssetMaintenance;
+global using AssetsManagementSystem.Services.AssetTransfer;
+global using AssetsManagementSystem.Services.Categories;
+global using AssetsManagementSystem.Services.DataConsistencyCheck;
+global using AssetsManagementSystem.Services.Document;
+global using AssetsManagementSystem.Services.ReceiveMaintainedAsset;
+global using AssetsManagementSystem.Services.SubCategory;
+global using AssetsManagementSystem.Services.Suppliers;
+
 
 
 

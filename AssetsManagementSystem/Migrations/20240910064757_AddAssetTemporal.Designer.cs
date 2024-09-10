@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetsManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240908104652_IntialCreation")]
-    partial class IntialCreation
+    [Migration("20240910064757_AddAssetTemporal")]
+    partial class AddAssetTemporal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,6 +67,16 @@ namespace AssetsManagementSystem.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime>("PeriodEnd")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodEnd");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodStart");
+
                     b.Property<DateOnly>("PurchaseDate")
                         .HasColumnType("date");
 
@@ -103,12 +113,22 @@ namespace AssetsManagementSystem.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.HasIndex("ManufacturerId")
-                        .IsUnique();
+                    b.HasIndex("ManufacturerId");
 
                     b.HasIndex("SubCategoryId");
 
-                    b.ToTable("Assets");
+                    b.ToTable("Asset", (string)null);
+
+                    b.ToTable(tb => tb.IsTemporal(ttb =>
+                            {
+                                ttb.UseHistoryTable("AssetHistory");
+                                ttb
+                                    .HasPeriodStart("PeriodStart")
+                                    .HasColumnName("PeriodStart");
+                                ttb
+                                    .HasPeriodEnd("PeriodEnd")
+                                    .HasColumnName("PeriodEnd");
+                            }));
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetDisposalRecord", b =>
@@ -154,40 +174,6 @@ namespace AssetsManagementSystem.Migrations
                     b.HasIndex("AssetId");
 
                     b.ToTable("AssetDisposalRecords");
-                });
-
-            modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetLifecycle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EventDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("PerformedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.HasIndex("PerformedById");
-
-                    b.ToTable("AssetLifecycle");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetMaintenanceRecords", b =>
@@ -604,28 +590,28 @@ namespace AssetsManagementSystem.Migrations
                         new
                         {
                             Id = new Guid("fc05f613-0e97-444e-b19b-018a223a7484"),
-                            ConcurrencyStamp = "39908f50-c114-40b5-863a-d5e98ab9084e",
+                            ConcurrencyStamp = "7883c276-af8a-4ec5-8240-c992cc2e63c5",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"),
-                            ConcurrencyStamp = "e6aa27c7-0ba3-497d-a55c-485a2f336648",
+                            ConcurrencyStamp = "7a78e424-d6ee-45b2-8cdf-24cf36250c0a",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"),
-                            ConcurrencyStamp = "d8144591-fa5d-4c3e-aea5-ba4acbe7b4e5",
+                            ConcurrencyStamp = "273ccfa9-e4fa-4ffc-8d17-b655f2325d6b",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = new Guid("62474474-f91b-483d-b0d8-2742c01146f0"),
-                            ConcurrencyStamp = "7f5fff95-4605-4372-af4c-766da18b28a3",
+                            ConcurrencyStamp = "39cffb05-5b55-492d-80d2-41efa10ea75a",
                             Name = "Auditor",
                             NormalizedName = "AUDITOR"
                         });
@@ -801,8 +787,8 @@ namespace AssetsManagementSystem.Migrations
                         {
                             Id = new Guid("bdabcf06-a956-4ef7-8045-3214e68b9b4c"),
                             AccessFailedCount = 0,
-                            AddedOnDate = new DateTime(2024, 9, 8, 13, 46, 52, 328, DateTimeKind.Local).AddTicks(6591),
-                            ConcurrencyStamp = "401defa2-55ac-4ed2-8a00-9d6c9f5866e7",
+                            AddedOnDate = new DateTime(2024, 9, 10, 9, 47, 56, 695, DateTimeKind.Local).AddTicks(5636),
+                            ConcurrencyStamp = "4ecbaee2-a928-4cb0-852d-6d35528037ec",
                             Email = "Mosaad_Ahmed@Gmail.com",
                             EmailConfirmed = false,
                             FirstName = "Mosaad",
@@ -810,10 +796,10 @@ namespace AssetsManagementSystem.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "MOSAAD_AHMED@GMAIL.COM",
                             NormalizedUserName = "MOSAAD_AHMED@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFBhFG9V4nVZGA781pXht2La2eoviv9P+qUuM9hOnfBmLAfuy22i10mg31kNF7z3Hg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECVy6V8CBQUAVR5FVUfO3GWIY+yBdU5uOB122wFwjTLmUdX0PZ3hqcLFo/PoHAyHHg==",
                             PhoneNumber = "01551251116",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2274a184-e6a8-4e64-a8c3-5a59caac7ff0",
+                            SecurityStamp = "8d3d1b85-57e1-459b-b898-3eb1618c8706",
                             TwoFactorEnabled = false,
                             UserName = "Mosaad_Ahmed@Gmail.com",
                             UserStatus = "Active"
@@ -944,8 +930,8 @@ namespace AssetsManagementSystem.Migrations
                         .IsRequired();
 
                     b.HasOne("AssetsManagementSystem.Models.DbSets.Manufacturer", "Manufacturer")
-                        .WithOne("Asset")
-                        .HasForeignKey("AssetsManagementSystem.Models.DbSets.Asset", "ManufacturerId")
+                        .WithMany("Assets")
+                        .HasForeignKey("ManufacturerId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -983,25 +969,6 @@ namespace AssetsManagementSystem.Migrations
                     b.Navigation("ApprovedBy");
 
                     b.Navigation("Asset");
-                });
-
-            modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetLifecycle", b =>
-                {
-                    b.HasOne("AssetsManagementSystem.Models.DbSets.Asset", "Asset")
-                        .WithMany("LifecycleEvents")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("AssetsManagementSystem.Models.DbSets.User", "PerformedBy")
-                        .WithMany()
-                        .HasForeignKey("PerformedById")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Asset");
-
-                    b.Navigation("PerformedBy");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetMaintenanceRecords", b =>
@@ -1247,8 +1214,6 @@ namespace AssetsManagementSystem.Migrations
                     b.Navigation("AssetsSuppliers");
 
                     b.Navigation("Documents");
-
-                    b.Navigation("LifecycleEvents");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.Category", b =>
@@ -1263,8 +1228,7 @@ namespace AssetsManagementSystem.Migrations
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.Manufacturer", b =>
                 {
-                    b.Navigation("Asset")
-                        .IsRequired();
+                    b.Navigation("Assets");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.SubCategory", b =>

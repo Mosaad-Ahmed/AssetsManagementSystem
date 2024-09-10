@@ -14,7 +14,7 @@
         {
             //  Verify that the Asset exists and is not already deleted
             var asset = await UnitOfWork.readRepository<Asset>()
-                                         .GetAsync(a => a.SerialNumber == disposalDto
+                                         .GetAsync(a => a.Id == disposalDto.AssetId 
                                          && (a.IsDeleted==false|| a.IsDeleted==null)
                                          &&a.Status != AssetStatus.Retired.ToString());
             if (asset == null)

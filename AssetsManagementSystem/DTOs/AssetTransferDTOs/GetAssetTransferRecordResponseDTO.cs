@@ -19,7 +19,7 @@
         public string ToLocationName { get; set; }   
 
          public string Status { get; set; }
-        public DateTime? ApprovalDate { get; set; }
+        public DateOnly? ApprovalDate { get; set; }
         public string RejectionReason { get; set; }
 
         public DateTime AddedOnDate { get; set; }

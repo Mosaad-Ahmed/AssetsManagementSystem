@@ -27,7 +27,9 @@
             await UnitOfWork.BeginTransactionAsync();
             try
             {
+                asset.ManufacturerId = 1;
                 await UnitOfWork.writeRepository<Asset>().AddAsync(asset);
+           
                 await UnitOfWork.SaveChangeAsync();
 
                 // Add related records in AssetsSuppliers table

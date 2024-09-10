@@ -86,8 +86,9 @@ namespace AssetsManagementSystem.Services.AssetTransfer
 
             var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == dto.AssetId &&
                                                                            (a.IsDeleted == false || a.IsDeleted == null) &&
-                                                                            a.Status != AssetStatus.Retired.ToString()
-                                                                            &&a.AssignedUserId == dto.FromUserId);
+                                                                            a.Status != AssetStatus.Retired.ToString()&&
+                                                                            a.AssignedUserId==dto.FromUserId
+                                                                            );
 
             if (asset == null) throw new KeyNotFoundException("Asset not found or has deleted.");
 
@@ -251,23 +252,25 @@ namespace AssetsManagementSystem.Services.AssetTransfer
                 AssetName = transferRecord.Asset.Name,  
 
                 FromUserId = transferRecord.FromUserId,
-                FromUserName = transferRecord.FromUser != null ? transferRecord.FromUser.UserName : string.Empty,  
+                FromUserName = transferRecord.FromUser != null ? string.Concat(transferRecord.FromUser.FirstName, transferRecord.FromUser.LastName) : string.Empty,  
 
                 ToUserId = transferRecord.ToUserId,
                 ToUserName = transferRecord.ToUser != null ? string.Concat(transferRecord.ToUser.FirstName, transferRecord.ToUser.LastName) : string.Empty, 
 
                 FromLocationId = transferRecord.FromLocationId,
-                FromLocationName = transferRecord.FromLocation != null ? string.Concat(transferRecord.FromUser.FirstName, transferRecord.FromUser.LastName) : string.Empty, 
+                FromLocationName = transferRecord.FromLocation != null ? transferRecord.FromLocation.Name : string.Empty, 
 
                 ToLocationId = transferRecord.ToLocationId,
                 ToLocationName = transferRecord.ToLocation != null ? transferRecord.ToLocation.Name : string.Empty, 
 
                 Status = transferRecord.Status,
-                ApprovalDate = transferRecord.ApprovalDate.HasValue ? (DateTime?)transferRecord.ApprovalDate.Value.ToDateTime(TimeOnly.MinValue) : null,
+                ApprovalDate = transferRecord.ApprovalDate.HasValue ? transferRecord.ApprovalDate : null,
                 RejectionReason = transferRecord.RejectionReason,
 
                 AddedOnDate = transferRecord.AddedOnDate,
                 UpdatedDate = transferRecord.UpdatedDate, 
+
+                IsUserTransfer = transferRecord.IsUserTransfer,
                 
             };
 
@@ -308,7 +311,7 @@ namespace AssetsManagementSystem.Services.AssetTransfer
                        ToLocationName = tr.ToLocation != null ? tr.ToLocation.Name : string.Empty,
 
                        Status = tr.Status,
-                       ApprovalDate = tr.ApprovalDate.HasValue ? (DateTime?)tr.ApprovalDate.Value.ToDateTime(TimeOnly.MinValue) : null,
+                       ApprovalDate = tr.ApprovalDate.HasValue ?tr.ApprovalDate : null,
                        RejectionReason = tr.RejectionReason,
 
                        AddedOnDate = tr.AddedOnDate,
@@ -350,7 +353,7 @@ namespace AssetsManagementSystem.Services.AssetTransfer
                         ToLocationName = tr.ToLocation != null ? tr.ToLocation.Name : string.Empty,
 
                         Status = tr.Status,
-                        ApprovalDate = tr.ApprovalDate.HasValue ? (DateTime?)tr.ApprovalDate.Value.ToDateTime(TimeOnly.MinValue) : null,
+                        ApprovalDate = tr.ApprovalDate.HasValue ? tr.ApprovalDate : null,
                         RejectionReason = tr.RejectionReason,
 
                         AddedOnDate = tr.AddedOnDate,

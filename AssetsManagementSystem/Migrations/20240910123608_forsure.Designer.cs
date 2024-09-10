@@ -4,6 +4,7 @@ using AssetsManagementSystem.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetsManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240910123608_forsure")]
+    partial class forsure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,8 +103,7 @@ namespace AssetsManagementSystem.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.HasIndex("ManufacturerId")
-                        .IsUnique();
+                    b.HasIndex("ManufacturerId");
 
                     b.HasIndex("SubCategoryId");
 
@@ -151,40 +153,6 @@ namespace AssetsManagementSystem.Migrations
                     b.HasIndex("AssetId");
 
                     b.ToTable("AssetDisposalRecords");
-                });
-
-            modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetLifecycle", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AssetId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("EventDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("EventType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("PerformedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AssetId");
-
-                    b.HasIndex("PerformedById");
-
-                    b.ToTable("AssetLifecycle");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetMaintenanceRecords", b =>
@@ -601,28 +569,28 @@ namespace AssetsManagementSystem.Migrations
                         new
                         {
                             Id = new Guid("fc05f613-0e97-444e-b19b-018a223a7484"),
-                            ConcurrencyStamp = "39908f50-c114-40b5-863a-d5e98ab9084e",
+                            ConcurrencyStamp = "1e104f2c-a1c0-4dfc-a9f5-0ca63211fd3f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"),
-                            ConcurrencyStamp = "e6aa27c7-0ba3-497d-a55c-485a2f336648",
+                            ConcurrencyStamp = "c47def99-1654-4b01-8223-9e9b1769e2f2",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"),
-                            ConcurrencyStamp = "d8144591-fa5d-4c3e-aea5-ba4acbe7b4e5",
+                            ConcurrencyStamp = "7ac3e0a8-69aa-4352-b782-8f11382a0f1e",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = new Guid("62474474-f91b-483d-b0d8-2742c01146f0"),
-                            ConcurrencyStamp = "7f5fff95-4605-4372-af4c-766da18b28a3",
+                            ConcurrencyStamp = "a8228163-f18b-4703-8d9f-5d0fc4f866af",
                             Name = "Auditor",
                             NormalizedName = "AUDITOR"
                         });
@@ -798,8 +766,8 @@ namespace AssetsManagementSystem.Migrations
                         {
                             Id = new Guid("bdabcf06-a956-4ef7-8045-3214e68b9b4c"),
                             AccessFailedCount = 0,
-                            AddedOnDate = new DateTime(2024, 9, 8, 13, 46, 52, 328, DateTimeKind.Local).AddTicks(6591),
-                            ConcurrencyStamp = "401defa2-55ac-4ed2-8a00-9d6c9f5866e7",
+                            AddedOnDate = new DateTime(2024, 9, 10, 15, 36, 7, 340, DateTimeKind.Local).AddTicks(5096),
+                            ConcurrencyStamp = "ee40935a-0a49-4061-a386-d509eba5d056",
                             Email = "Mosaad_Ahmed@Gmail.com",
                             EmailConfirmed = false,
                             FirstName = "Mosaad",
@@ -807,10 +775,10 @@ namespace AssetsManagementSystem.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "MOSAAD_AHMED@GMAIL.COM",
                             NormalizedUserName = "MOSAAD_AHMED@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFBhFG9V4nVZGA781pXht2La2eoviv9P+qUuM9hOnfBmLAfuy22i10mg31kNF7z3Hg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOEMPUXTzA+apAZhPnM6RCzf7st7upl5lx9WXa/rqfz95VH65TtYB/jpNahr9ta3XA==",
                             PhoneNumber = "01551251116",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "2274a184-e6a8-4e64-a8c3-5a59caac7ff0",
+                            SecurityStamp = "75050396-8313-455a-8967-4ef9ae2f25c4",
                             TwoFactorEnabled = false,
                             UserName = "Mosaad_Ahmed@Gmail.com",
                             UserStatus = "Active"
@@ -941,8 +909,8 @@ namespace AssetsManagementSystem.Migrations
                         .IsRequired();
 
                     b.HasOne("AssetsManagementSystem.Models.DbSets.Manufacturer", "Manufacturer")
-                        .WithOne("Asset")
-                        .HasForeignKey("AssetsManagementSystem.Models.DbSets.Asset", "ManufacturerId")
+                        .WithMany("Assets")
+                        .HasForeignKey("ManufacturerId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -980,25 +948,6 @@ namespace AssetsManagementSystem.Migrations
                     b.Navigation("ApprovedBy");
 
                     b.Navigation("Asset");
-                });
-
-            modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetLifecycle", b =>
-                {
-                    b.HasOne("AssetsManagementSystem.Models.DbSets.Asset", "Asset")
-                        .WithMany("LifecycleEvents")
-                        .HasForeignKey("AssetId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("AssetsManagementSystem.Models.DbSets.User", "PerformedBy")
-                        .WithMany()
-                        .HasForeignKey("PerformedById")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Asset");
-
-                    b.Navigation("PerformedBy");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.AssetMaintenanceRecords", b =>
@@ -1244,8 +1193,6 @@ namespace AssetsManagementSystem.Migrations
                     b.Navigation("AssetsSuppliers");
 
                     b.Navigation("Documents");
-
-                    b.Navigation("LifecycleEvents");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.Category", b =>
@@ -1260,8 +1207,7 @@ namespace AssetsManagementSystem.Migrations
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.Manufacturer", b =>
                 {
-                    b.Navigation("Asset")
-                        .IsRequired();
+                    b.Navigation("Assets");
                 });
 
             modelBuilder.Entity("AssetsManagementSystem.Models.DbSets.SubCategory", b =>

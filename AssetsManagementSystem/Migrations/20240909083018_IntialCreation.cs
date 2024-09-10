@@ -378,33 +378,6 @@ namespace AssetsManagementSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AssetLifecycle",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    AssetId = table.Column<int>(type: "int", nullable: false),
-                    EventDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EventType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PerformedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AssetLifecycle", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AssetLifecycle_AspNetUsers_PerformedById",
-                        column: x => x.PerformedById,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AssetLifecycle_Assets_AssetId",
-                        column: x => x.AssetId,
-                        principalTable: "Assets",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AssetMaintenanceRecords",
                 columns: table => new
                 {
@@ -596,16 +569,16 @@ namespace AssetsManagementSystem.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("62474474-f91b-483d-b0d8-2742c01146f0"), "7f5fff95-4605-4372-af4c-766da18b28a3", "Auditor", "AUDITOR" },
-                    { new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"), "e6aa27c7-0ba3-497d-a55c-485a2f336648", "User", "USER" },
-                    { new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"), "d8144591-fa5d-4c3e-aea5-ba4acbe7b4e5", "Manager", "MANAGER" },
-                    { new Guid("fc05f613-0e97-444e-b19b-018a223a7484"), "39908f50-c114-40b5-863a-d5e98ab9084e", "Admin", "ADMIN" }
+                    { new Guid("62474474-f91b-483d-b0d8-2742c01146f0"), "92619e99-30e9-4781-a248-466ec5925b44", "Auditor", "AUDITOR" },
+                    { new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"), "51cf6ed2-1fdd-4d16-8ae3-e60dd9568e26", "User", "USER" },
+                    { new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"), "40fbe03b-e655-4769-af08-bba3d2e9bdcc", "Manager", "MANAGER" },
+                    { new Guid("fc05f613-0e97-444e-b19b-018a223a7484"), "2845f0ee-23d9-49cc-bd0f-980ac4f8b388", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AddedOnDate", "ConcurrencyStamp", "DeletedDate", "Email", "EmailConfirmed", "FirstName", "IsDeleted", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedDate", "UserName", "UserStatus" },
-                values: new object[] { new Guid("bdabcf06-a956-4ef7-8045-3214e68b9b4c"), 0, new DateTime(2024, 9, 8, 13, 46, 52, 328, DateTimeKind.Local).AddTicks(6591), "401defa2-55ac-4ed2-8a00-9d6c9f5866e7", null, "Mosaad_Ahmed@Gmail.com", false, "Mosaad", null, "Ahmed", false, null, "MOSAAD_AHMED@GMAIL.COM", "MOSAAD_AHMED@GMAIL.COM", "AQAAAAIAAYagAAAAEFBhFG9V4nVZGA781pXht2La2eoviv9P+qUuM9hOnfBmLAfuy22i10mg31kNF7z3Hg==", "01551251116", false, null, null, "2274a184-e6a8-4e64-a8c3-5a59caac7ff0", false, null, "Mosaad_Ahmed@Gmail.com", "Active" });
+                values: new object[] { new Guid("bdabcf06-a956-4ef7-8045-3214e68b9b4c"), 0, new DateTime(2024, 9, 9, 11, 30, 17, 720, DateTimeKind.Local).AddTicks(5973), "060da8b6-0adc-4a0c-a1e0-950e37fa569d", null, "Mosaad_Ahmed@Gmail.com", false, "Mosaad", null, "Ahmed", false, null, "MOSAAD_AHMED@GMAIL.COM", "MOSAAD_AHMED@GMAIL.COM", "AQAAAAIAAYagAAAAECBtM/B8ej6Zqp7KRI977AU/EvY8K9DBSy8HilwmyI3ZW1pJd2vo+XENK3xL6iDH9Q==", "01551251116", false, null, null, "6222157f-bf2a-49af-ba95-b3442dbb37ae", false, null, "Mosaad_Ahmed@Gmail.com", "Active" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -657,16 +630,6 @@ namespace AssetsManagementSystem.Migrations
                 column: "AssetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AssetLifecycle_AssetId",
-                table: "AssetLifecycle",
-                column: "AssetId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AssetLifecycle_PerformedById",
-                table: "AssetLifecycle",
-                column: "PerformedById");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AssetMaintenanceRecords_AssetId",
                 table: "AssetMaintenanceRecords",
                 column: "AssetId");
@@ -704,8 +667,7 @@ namespace AssetsManagementSystem.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Assets_ManufacturerId",
                 table: "Assets",
-                column: "ManufacturerId",
-                unique: true);
+                column: "ManufacturerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Assets_SubCategoryId",
@@ -808,9 +770,6 @@ namespace AssetsManagementSystem.Migrations
 
             migrationBuilder.DropTable(
                 name: "AssetDisposalRecords");
-
-            migrationBuilder.DropTable(
-                name: "AssetLifecycle");
 
             migrationBuilder.DropTable(
                 name: "AssetMaintenanceRecords");

@@ -8,6 +8,6 @@
 
         public string Info { get; set; }
 
-        public virtual Asset Asset { get; set; }
+        public virtual List<Asset> Assets { get; set; }
     }
 }

@@ -41,6 +41,14 @@ namespace AssetsManagementSystem.Services.ReceiveMaintainedAsset
                                            (l.IsDeleted == null || l.IsDeleted == false)
                                            );
 
+            
+            
+            
+            
+            
+            
+            
+            
             if (location is null)
                 throw new KeyNotFoundException("THIS location Is deleted or not found");
 
