@@ -20,15 +20,16 @@ namespace AssetsManagementSystem.Controllers
 
 
         [HttpPost("AddMaintenanceRecord")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> AddMaintenanceRecord([FromBody] AddAssetMaintenanceRecordDTO maintenanceDto)
         {
             try
             {
-                _logger.LogInformation("Attempting to add a new maintenance record for asset ID {AssetId}", maintenanceDto.AssetId);
+                _logger.LogInformation("Attempting to add a new maintenance record for asset ID {AssetId}", maintenanceDto.AssetSerialNumber);
 
                 await _assetMaintenanceService.AddMaintenanceRecordAsync(maintenanceDto);
 
-                _logger.LogInformation("Successfully added maintenance record for asset ID {AssetId}", maintenanceDto.AssetId);
+                _logger.LogInformation("Successfully added maintenance record for asset ID {AssetId}", maintenanceDto.AssetSerialNumber);
 
                 return Ok(new { message = "Maintenance record added successfully." });
             }
@@ -39,13 +40,14 @@ namespace AssetsManagementSystem.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while adding the maintenance record for asset ID {AssetId}", maintenanceDto.AssetId);
+                _logger.LogError(ex, "An error occurred while adding the maintenance record for asset ID {AssetId}", maintenanceDto.AssetSerialNumber);
                 return StatusCode(500, new { message = "An unexpected error occurred. Please try again later." });
             }
         }
 
 
         [HttpGet("GetMaintenanceRecordById/{maintenanceRecordId}")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
         public async Task<IActionResult> GetMaintenanceRecordById(int maintenanceRecordId)
         {
             try
@@ -69,7 +71,10 @@ namespace AssetsManagementSystem.Controllers
             }
         }
 
+
+
         [HttpGet("GetAllMaintenanceRecords")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
         public async Task<IActionResult> GetAllMaintenanceRecords()
         {
             try
@@ -95,7 +100,10 @@ namespace AssetsManagementSystem.Controllers
         }
 
 
+
         [HttpPut("UpdateMaintenanceRecord")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> UpdateMaintenanceRecord([FromBody] UpdateAssetMaintenanceRecordDTO maintenanceDto)
         {
             try

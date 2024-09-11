@@ -1,4 +1,6 @@
-﻿namespace AssetsManagementSystem.Services
+﻿using AssetsManagementSystem.Services.Manfacture;
+
+namespace AssetsManagementSystem.Services
 {
     public static class Registeration
     {
@@ -25,6 +27,8 @@
             services.AddScoped<AssetTransferService>();
 
             services.AddScoped<DocumentService>();
+
+            services.AddScoped<ManfactureService>();
 
             services.AddScoped<ReceiveMaintainedAssetService>();
 

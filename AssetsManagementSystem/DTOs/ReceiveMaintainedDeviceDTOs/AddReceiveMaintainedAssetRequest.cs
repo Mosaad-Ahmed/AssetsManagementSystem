@@ -3,7 +3,7 @@
     public class AddReceiveMaintainedAssetRequest
     {
         public string Title { get; set; }
-        public int AssetId { get; set; }
+        public string AssetSerialNumber { get; set; }
         public Guid UserRecieveDevFromSupplierId { get; set; }
     
         public Guid NewUserAssignedId { get; set; }

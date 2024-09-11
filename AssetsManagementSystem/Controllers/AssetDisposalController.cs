@@ -14,6 +14,8 @@ namespace AssetsManagementSystem.Controllers
 
         //[Authorize(Roles = "Manager, Admin")]
         [HttpPost("AddDisposalRecord")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> AddAssetDisposalRecord([FromBody] AddAssetDisposalRecordDTO disposalDto)
         {
             if (!ModelState.IsValid)
@@ -38,6 +40,8 @@ namespace AssetsManagementSystem.Controllers
 
 
         [HttpGet("GetDisposalRecord/{disposalRecordId}")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetAssetDisposalRecordById(int disposalRecordId)
         {
             try
@@ -58,6 +62,8 @@ namespace AssetsManagementSystem.Controllers
 
 
         [HttpGet("GetAllDisposalRecords")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetAllAssetDisposalRecords()
         {
             try
@@ -78,7 +84,7 @@ namespace AssetsManagementSystem.Controllers
         }
 
 
-        //[Authorize(Roles = "Manager, Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPut("UpdateDisposalRecord")]
         public async Task<IActionResult> UpdateAssetDisposalRecord([FromForm] UpdateAssetDisposalRecordDTO disposalDto)
         {
@@ -103,8 +109,9 @@ namespace AssetsManagementSystem.Controllers
         }
 
 
-        //[Authorize(Roles = "Manager, Admin")]
-        [HttpDelete("DeleteDisposalRecord/{disposalRecordId}")]
+         [HttpDelete("DeleteDisposalRecord/{disposalRecordId}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> DeleteAssetDisposalRecord(int disposalRecordId)
         {
             try

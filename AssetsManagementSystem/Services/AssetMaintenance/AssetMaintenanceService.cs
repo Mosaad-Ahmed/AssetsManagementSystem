@@ -19,7 +19,7 @@ namespace AssetsManagementSystem.Services.AssetMaintenance
         public async Task AddMaintenanceRecordAsync(AddAssetMaintenanceRecordDTO maintenanceDto)
         {
             //    Verify that the Asset exists
-            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == maintenanceDto.AssetId && (a.IsDeleted==false || a.IsDeleted == null));
+            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.SerialNumber == maintenanceDto.AssetSerialNumber && (a.IsDeleted==false || a.IsDeleted == null));
             if (asset == null)
             {
                 throw new KeyNotFoundException("Asset not found or has been deleted.");
@@ -42,7 +42,7 @@ namespace AssetsManagementSystem.Services.AssetMaintenance
             //   Add the maintenance record
             var maintenanceRecord = new AssetMaintenanceRecords
             {
-                AssetId = maintenanceDto.AssetId,
+                AssetId = asset.Id,
                 Description = maintenanceDto.Description,
                 AddedOnDate = DateTime.Now,
                 PerformedById = Guid.Parse(UserId),
@@ -90,7 +90,7 @@ namespace AssetsManagementSystem.Services.AssetMaintenance
             maintenanceDto.AssetName = maintenanceRecord.Asset.Name;
 
             var supplier = await UnitOfWork.readRepository<Supplier>().GetAsync(x => x.Id == maintenanceRecord.TOWhomOfSupplierId);
-            maintenanceDto.TOWhomOfSupplierName = supplier.Name;
+            maintenanceDto.TOWhomOfSupplierName = supplier.CompanyName;
               
             var user = await userManager.FindByIdAsync(maintenanceRecord.TOWhomOfUserId.ToString());
             maintenanceDto.TOWhomOfUserName = string.Concat(user.FirstName," ",user.LastName);

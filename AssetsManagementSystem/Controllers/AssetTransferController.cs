@@ -21,6 +21,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Transfer Location to Location
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> TransferLocationToLocation([FromBody] LocationToLocationTransferDTO dto)
         {
             if (!ModelState.IsValid)
@@ -45,6 +47,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Transfer User to User
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> TransferUserToUser([FromBody] UserToUserTransferDTO dto)
         {
             if (!ModelState.IsValid)
@@ -69,6 +73,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Transfer User and Location
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> TransferUserAndLocation([FromBody] UserAndLocationTransferDTO dto)
         {
             if (!ModelState.IsValid)
@@ -93,6 +99,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Approve Transfer
         [HttpPost("{id}/approve")]
+        [Authorize(Roles = "User,Manager")]
+
         public async Task<IActionResult> ApproveTransfer(int id)
         {
             try
@@ -116,6 +124,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Reject Transfer
         [HttpPost("{id}/reject")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> RejectTransfer(int id, [FromBody] string rejectionReason)
         {
             if (string.IsNullOrWhiteSpace(rejectionReason))
@@ -145,6 +155,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Update Location to Location Transfer
         [HttpGet("GetAssetForCurrentUser")]
+        [Authorize(Roles = "User,Manager")]
+
         public async Task<IActionResult> GetAssetForCurrentUser()
         {
             try
@@ -163,6 +175,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Update User to User Transfer
         [HttpPut("{id}/usertouser")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> UpdateUserToUserTransfer(int id, [FromBody] UpdateUserToUserTransferDTO dto)
         {
             if (!ModelState.IsValid)
@@ -192,6 +206,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Update User and Location Transfer
         [HttpPut("{id}/userandlocation")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> UpdateUserAndLocationTransfer(int id, [FromBody] UpdateUserAndLocationTransferDTO dto)
         {
             if (!ModelState.IsValid)
@@ -221,6 +237,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Delete Asset Transfer
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> DeleteAssetTransfer(int id)
         {
             try
@@ -244,6 +262,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Get Asset Transfer by ID
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetAssetTransferById(int id)
         {
             try
@@ -267,6 +287,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Get All Asset Transfers
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetAllAssetTransfers()
         {
             try

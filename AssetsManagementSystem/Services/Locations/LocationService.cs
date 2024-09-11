@@ -23,7 +23,7 @@ namespace AssetsManagementSystem.Services.Locations
             }
 
             var existingLocation = await UnitOfWork.readRepository<Location>()
-                                       .GetAsync(l => l.Name == addLocationRequest.Name);
+                                       .GetAsync(l => l.Name == addLocationRequest.Name || l.Barcode==addLocationRequest.Barcode);
 
             if (existingLocation != null)
             {
@@ -41,15 +41,15 @@ namespace AssetsManagementSystem.Services.Locations
         #endregion
 
         #region Retrieve a location by ID
-        public async Task<GetLocationRequestDTO> GetLocationByIdAsync(int locationId)
+        public async Task<GetLocationRequestDTO> GetLocationByIdAsync(string locationBarcode)
         {
-            if (locationId <= 0)
+            if (string.IsNullOrEmpty(locationBarcode))
             {
-                throw new ArgumentException("Invalid location ID.");
+                throw new ArgumentException("Invalid location Barcode.");
             }
 
             var location = await UnitOfWork.readRepository<Location>()
-                .GetAsync(l => l.Id == locationId && (l.IsDeleted == false || l.IsDeleted == null));
+                .GetAsync(l => l.Barcode == locationBarcode && (l.IsDeleted == false || l.IsDeleted == null));
             var getLocationRequestDTO = Mapper.Map<GetLocationRequestDTO,Location>(location);
 
             if (location == null)
@@ -74,18 +74,18 @@ namespace AssetsManagementSystem.Services.Locations
         #endregion
 
         #region Update a location
-        public async Task UpdateLocationAsync(int locationId, UpdateLocationRequestDTO updateLocationRequest)
+        public async Task UpdateLocationAsync(string locationBarcode, UpdateLocationRequestDTO updateLocationRequest)
         {
             if (updateLocationRequest == null)
             {
                 throw new ArgumentNullException(nameof(updateLocationRequest), "Location details cannot be null.");
             }
-            var updateLocation = await GetLocationByIdAsync(locationId);
+            var updateLocation = await GetLocationByIdAsync(locationBarcode);
 
             var location = Mapper.Map<Location,GetLocationRequestDTO>(updateLocation);
 
             var existingLocation = await UnitOfWork.readRepository<Location>()
-                                      .GetAsync(l => l.Name == updateLocationRequest.Name && l.Id != locationId 
+                                      .GetAsync(l => l.Name == updateLocationRequest.Name && l.Barcode != locationBarcode 
                                       && (l.IsDeleted == false || l.IsDeleted == null));
 
             if (existingLocation != null)
@@ -104,12 +104,12 @@ namespace AssetsManagementSystem.Services.Locations
         #endregion
 
         #region Delete a location
-        public async Task DeleteLocationAsync(int locationId)
+        public async Task DeleteLocationAsync(string locationBarcode)
         {
-            var updateLocation = await GetLocationByIdAsync(locationId);
+            var updateLocation = await GetLocationByIdAsync(locationBarcode);
 
             var asset = await UnitOfWork.readRepository<Asset>()
-              .GetAsync(predicate: a => a.LocationId == locationId && (a.IsDeleted == false || a.IsDeleted == null));
+              .GetAsync(predicate: a => a.LocationId == updateLocation.Id && (a.IsDeleted == false || a.IsDeleted == null));
           
             if (asset is not null)
                 throw new InvalidOperationException("There are suppliers dependent on this supplier,Please Go and delete it first");

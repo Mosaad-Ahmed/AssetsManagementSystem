@@ -41,7 +41,7 @@ namespace AssetsManagementSystem.DTOs.AssetDTOs
 
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
         [FutureDate("PurchaseDate", ErrorMessage = "Warranty expiry date must be after the purchase date.")]
-        public DateOnly? WarrantyExpiryDate { get; set; }
+        public DateOnly WarrantyExpiryDate { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         [DefaultValue(AssetStatus.Active)]

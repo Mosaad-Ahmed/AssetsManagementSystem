@@ -10,6 +10,6 @@
       
 
         [Required(ErrorMessage = "To Location ID is required.")]
-        public int ToLocationId { get; set; }
+        public string ToLocationBarcode { get; set; }
     }
 }

@@ -14,6 +14,7 @@ namespace AssetsManagementSystem.Data.Configurations
                .HasForeignKey(fk => fk.ManufacturerId)
                .IsRequired(true);
 
+          //  builder.HasKey(a => a.SerialNumber);
            // builder.ToTable(nameof(Asset),a=>a.IsTemporal());
         }
     }

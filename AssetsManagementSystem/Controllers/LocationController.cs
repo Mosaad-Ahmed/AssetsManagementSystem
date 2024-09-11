@@ -16,6 +16,7 @@
         #region AddNewLocation
 
         [HttpPost("add")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> AddLocation([FromBody] AddLocationRequestDTO addLocationRequest)
         {
             if (!ModelState.IsValid)
@@ -46,10 +47,12 @@
 
         #region GetLocationById
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetLocationById(int id)
+        [HttpGet()]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
+        public async Task<IActionResult> GetLocationById(string locationBarcode)
         {
-            if (id <= 0)
+            if (string.IsNullOrEmpty(locationBarcode))
             {
                 _logger.LogWarning("Invalid location ID in GetLocationById request");
                 return BadRequest(new { Error = "Invalid location ID" });
@@ -57,13 +60,13 @@
 
             try
             {
-                var location = await _locationService.GetLocationByIdAsync(id);
-                _logger.LogInformation($"Location with ID {id} retrieved successfully.");
+                var location = await _locationService.GetLocationByIdAsync(locationBarcode);
+                _logger.LogInformation($"Location with ID {locationBarcode} retrieved successfully.");
                 return Ok(location);
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.LogWarning(ex, $"Location with ID {id} not found.");
+                _logger.LogWarning(ex, $"Location with ID {locationBarcode} not found.");
                 return NotFound(new { Error = ex.Message });
             }
             catch (Exception ex)
@@ -78,6 +81,8 @@
         #region GetAllLocations
 
         [HttpGet("all")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetAllLocations()
         {
             try
@@ -96,9 +101,11 @@
         #endregion
 
         #region UpdateLocation
+         
+        [HttpPut("update/{locationBarcode}")]
+        [Authorize(Roles = "Admin,Manager")]
 
-        [HttpPut("update/{id:int}")]
-        public async Task<IActionResult> UpdateLocation(int id, [FromBody] UpdateLocationRequestDTO updateLocationRequest)
+        public async Task<IActionResult> UpdateLocation(string locationBarcode, [FromBody] UpdateLocationRequestDTO updateLocationRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -106,7 +113,7 @@
                 return BadRequest(ModelState);
             }
 
-            if (id <= 0)
+            if (string.IsNullOrEmpty(locationBarcode))
             {
                 _logger.LogWarning("Invalid location ID in UpdateLocation request");
                 return BadRequest(new { Error = "Invalid location ID" });
@@ -114,8 +121,8 @@
 
             try
             {
-                await _locationService.UpdateLocationAsync(id, updateLocationRequest);
-                _logger.LogInformation($"Location with ID {id} updated successfully.");
+                await _locationService.UpdateLocationAsync(locationBarcode, updateLocationRequest);
+                _logger.LogInformation($"Location with ID {locationBarcode} updated successfully.");
                 return Ok(new { Message = "Location updated successfully" });
             }
             catch (InvalidOperationException ex)
@@ -125,7 +132,7 @@
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.LogWarning(ex, $"Location with ID {id} not found.");
+                _logger.LogWarning(ex, $"Location with ID {locationBarcode} not found.");
                 return NotFound(new { Error = ex.Message });
             }
             catch (Exception ex)
@@ -139,10 +146,12 @@
 
         #region DeleteLocation
 
-        [HttpDelete("delete/{id:int}")]
-        public async Task<IActionResult> DeleteLocation(int id)
+        [HttpDelete("delete/{locationBarcode}")]
+        [Authorize(Roles = "Admin,Manager")]
+
+        public async Task<IActionResult> DeleteLocation(string locationBarcode)
         {
-            if (id <= 0)
+            if (string.IsNullOrEmpty(locationBarcode))
             {
                 _logger.LogWarning("Invalid location ID in DeleteLocation request");
                 return BadRequest(new { Error = "Invalid location ID" });
@@ -150,13 +159,13 @@
 
             try
             {
-                await _locationService.DeleteLocationAsync(id);
-                _logger.LogInformation($"Location with ID {id} deleted successfully.");
+                await _locationService.DeleteLocationAsync(locationBarcode);
+                _logger.LogInformation($"Location with ID {locationBarcode} deleted successfully.");
                 return Ok(new { Message = "Location deleted successfully" });
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.LogWarning(ex, $"Location with ID {id} not found.");
+                _logger.LogWarning(ex, $"Location with ID {locationBarcode} not found.");
                 return NotFound(new { Error = ex.Message });
             }
             catch (Exception ex)

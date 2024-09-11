@@ -3,7 +3,7 @@
     public class AddAssetMaintenanceRecordDTO
     {
         [Required(ErrorMessage = "Asset ID is required.")]
-        public int AssetId { get; set; }
+        public string AssetSerialNumber { get; set; }
 
         [Required(ErrorMessage = "Maintenance date is required.")]
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]

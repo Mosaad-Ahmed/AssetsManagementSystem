@@ -27,7 +27,6 @@
             await UnitOfWork.BeginTransactionAsync();
             try
             {
-                asset.ManufacturerId = 1;
                 await UnitOfWork.writeRepository<Asset>().AddAsync(asset);
            
                 await UnitOfWork.SaveChangeAsync();
@@ -43,15 +42,15 @@
                 throw;
             }
 
-            return await GetAssetByIdAsync(asset.Id);
+            return await GetAssetByIdAsync(asset.SerialNumber);
         }
         #endregion
 
         #region Get Asset by ID
-        public async Task<GetAssetResponseDTO> GetAssetByIdAsync(int id)
+        public async Task<GetAssetResponseDTO> GetAssetByIdAsync(string serialNumber)
         {
             var asset = await UnitOfWork.readRepository<Asset>()
-                .GetAsync(a => a.Id == id && 
+                .GetAsync(a => a.SerialNumber == serialNumber && 
                 (a.IsDeleted == false || a.IsDeleted == null)&&
                 a.Status!=AssetStatus.Retired.ToString());
 
@@ -75,7 +74,7 @@
                 AssignedUserName = string.Concat(asset.AssignedUser.FirstName, " ", asset.AssignedUser.LastName),
                 CategoryName = asset.Category.Name,
                 SubCategoryName = asset.AssetSubCategory.Name,
-                SupplierNames = asset.AssetsSuppliers.Select(s => s.Supplier.Name).ToList(),
+                SupplierNames = asset.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
                 AddedOnDate = asset.AddedOnDate,
                 UpdatedDate = asset.UpdatedDate
             };
@@ -107,7 +106,7 @@
                 AssignedUserName =string.Concat(a.AssignedUser.FirstName," ",a.AssignedUser.LastName),
                 CategoryName = a.Category?.Name, 
                 SubCategoryName=a.AssetSubCategory?.Name,
-                SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.Name).ToList(),  
+                SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),  
                 AddedOnDate = a.AddedOnDate,
                 UpdatedDate = a.UpdatedDate
             }).ToList();
@@ -117,13 +116,13 @@
         #endregion
 
         #region Update Asset
-        public async Task<GetAssetResponseDTO> UpdateAssetAsync(int id, UpdateAssetRequestDTO updateAssetDto)
+        public async Task<GetAssetResponseDTO> UpdateAssetAsync(string serialNumber, UpdateAssetRequestDTO updateAssetDto)
         {
             await UnitOfWork.BeginTransactionAsync();
             try
             {
                 var existingAsset = await UnitOfWork.readRepository<Asset>()
-                    .GetAsync(a => a.Id == id && 
+                    .GetAsync(a => a.SerialNumber == serialNumber && 
                     (a.IsDeleted == false || a.IsDeleted == null)&&
                     a.Status!=AssetStatus.Retired.ToString());
 
@@ -162,7 +161,7 @@
 
                 existingAsset.UpdatedDate = DateTime.Now;
 
-                await UnitOfWork.writeRepository<Asset>().UpdateAsync(id, existingAsset);
+                await UnitOfWork.writeRepository<Asset>().UpdateAsync(existingAsset.Id, existingAsset);
                 await UnitOfWork.SaveChangeAsync();
 
                 // Delete old supplier associations and add the new ones
@@ -171,7 +170,7 @@
 
                 await UnitOfWork.CommitTransactionAsync();
 
-                return await GetAssetByIdAsync(existingAsset.Id);
+                return await GetAssetByIdAsync(existingAsset.SerialNumber);
             }
             catch
             {
@@ -182,10 +181,10 @@
         #endregion
 
         #region Delete Asset  
-        public async Task DeleteAssetAsync(int id)
+        public async Task DeleteAssetAsync(string serialNumber)
         {
             var existingAsset = await UnitOfWork.readRepository<Asset>()
-                .GetAsync(a => a.Id == id && (a.IsDeleted == false || a.IsDeleted == null));
+                .GetAsync(a => a.SerialNumber == serialNumber && (a.IsDeleted == false || a.IsDeleted == null));
 
             if (existingAsset == null)
             {
@@ -199,7 +198,7 @@
             await UnitOfWork.BeginTransactionAsync();
             try
             {
-                await UnitOfWork.writeRepository<Asset>().UpdateAsync(id, existingAsset);
+                await UnitOfWork.writeRepository<Asset>().UpdateAsync(existingAsset.Id, existingAsset);
                await DeleteAssetSuppliers (existingAsset.Id);
                 await UnitOfWork.SaveChangeAsync();
                 await UnitOfWork.CommitTransactionAsync();

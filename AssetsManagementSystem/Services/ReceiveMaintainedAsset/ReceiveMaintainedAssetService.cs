@@ -26,7 +26,7 @@ namespace AssetsManagementSystem.Services.ReceiveMaintainedAsset
 
             #region Asset
             Asset asset = await UnitOfWork.readRepository<Asset>().GetAsync(predicate:
-                                            a => a.Id == addReceiveMaintainedAsset.AssetId &&
+                                            a => a.SerialNumber == addReceiveMaintainedAsset.AssetSerialNumber &&
                                             a.Status == AssetStatus.InRepair.ToString() &&
                                             (a.IsDeleted == null || a.IsDeleted == false)
                                             );
@@ -70,14 +70,14 @@ namespace AssetsManagementSystem.Services.ReceiveMaintainedAsset
             var UploadedDoc = await documentService.AddDocumentAsync(new DTOs.DocumentDTOs.AddDocumentRequestDTO()
             {
                 Title = addReceiveMaintainedAsset.Title,
-                AssetId = addReceiveMaintainedAsset.AssetId,
+                AssetId = asset.Id,
                 PdfFile = addReceiveMaintainedAsset.ReceiveMaintainedAssetDoc
             });
 
             #region Mapping
             var receiveMaintainedAsset = new Models.DbSets.ReceiveMaintainedAsset()
             {
-                AssetId = addReceiveMaintainedAsset.AssetId,
+                AssetId = asset.Id,
                 DateOfRecieve = DateOnly.FromDateTime(DateTime.Now),
                 DocumentId = UploadedDoc.Id,
                 NewUserAssignedId = addReceiveMaintainedAsset.NewUserAssignedId,
@@ -95,7 +95,7 @@ namespace AssetsManagementSystem.Services.ReceiveMaintainedAsset
                 asset.LocationId = addReceiveMaintainedAsset.NewLocationAssignedId;
                 asset.AssignedUserId = addReceiveMaintainedAsset.NewUserAssignedId;
                 asset.Status=AssetStatus.Active.ToString();
-                await UnitOfWork.writeRepository<Asset>().UpdateAsync(addReceiveMaintainedAsset.AssetId, asset);
+                await UnitOfWork.writeRepository<Asset>().UpdateAsync(asset.Id, asset);
 
                 await UnitOfWork.CommitTransactionAsync();
             }

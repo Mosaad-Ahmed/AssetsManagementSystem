@@ -22,7 +22,7 @@ namespace AssetsManagementSystem.Services.Suppliers
             }
 
              var existingSupplier = await UnitOfWork.readRepository<Supplier>()
-                                        .GetAsync(s => s.Name == addSupplierRequest.Name);
+                                        .GetAsync(s => s.CompanyName == addSupplierRequest.CompanyName);
 
             if (existingSupplier != null)
             {
@@ -88,16 +88,19 @@ namespace AssetsManagementSystem.Services.Suppliers
             var supplier=Mapper.Map<Supplier,GetSupplierRequestDTO>(supplierDTO);
 
              var existingSupplier = await UnitOfWork.readRepository<Supplier>()
-                                        .GetAsync(s => s.Name == updateSupplierRequest.Name && s.Id != supplierId);
+                                        .GetAsync(s => s.CompanyName == updateSupplierRequest.CompanyName && s.Id != supplierId);
 
             if (existingSupplier != null)
             {
                 throw new InvalidOperationException("Another supplier with the same name already exists.");
             }
 
-             supplier.Name = updateSupplierRequest.Name;
-           
-            supplier.ContactInfo = updateSupplierRequest.ContactInfo;
+             supplier.CompanyName = updateSupplierRequest.CompanyName;
+
+            supplier.email = updateSupplierRequest.email;
+            supplier.Address = updateSupplierRequest.Address;
+            supplier.PhoneNumber = updateSupplierRequest.PhoneNumber;
+            supplier.Note = updateSupplierRequest.Note;
 
             supplier.UpdatedDate = DateTime.Now;
 

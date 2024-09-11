@@ -20,6 +20,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region GET: api/Supplier/{id}
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetSupplierById(int id)
         {
             if (id <= 0)
@@ -48,6 +50,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region GET: api/Supplier
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetAllSuppliers()
         {
             try
@@ -65,6 +69,8 @@ namespace AssetsManagementSystem.Controllers
           
         #region POST: api/Supplier
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> AddSupplier([FromBody] AddSupplierRequestDTO addSupplierRequest)
         {
             if (!ModelState.IsValid)
@@ -76,7 +82,7 @@ namespace AssetsManagementSystem.Controllers
             try
             {
                 await _supplierService.AddSupplierAsync(addSupplierRequest);
-                _logger.LogInformation($"Supplier '{addSupplierRequest.Name}' added successfully.");
+                _logger.LogInformation($"Supplier '{addSupplierRequest.CompanyName}' added successfully.");
                 return Ok(new { Message = "Supplier added successfully" });
             }
             catch (InvalidOperationException ex)
@@ -94,6 +100,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region PUT: api/Supplier/{id}
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> UpdateSupplier(int id, [FromBody] UpdateSupplierRequestDTO updateSupplierRequest)
         {
             if (!ModelState.IsValid)
@@ -134,6 +142,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region DELETE: api/Supplier/{id}
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> DeleteSupplier(int id)
         {
             if (id <= 0)

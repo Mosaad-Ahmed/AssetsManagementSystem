@@ -21,6 +21,8 @@ namespace AssetsManagementSystem.Controllers
         }
         #region Add ReceiveMaintainedAsset
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> AddAsset([FromForm] AddReceiveMaintainedAssetRequest addReceiveMaintainedAsset)
         {
             try

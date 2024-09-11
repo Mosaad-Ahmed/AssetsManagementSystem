@@ -2,8 +2,9 @@
 {
     public class UserAndLocationTransferDTO
     {
-        [Required(ErrorMessage = "Asset ID is required.")]
-        public int AssetId { get; set; }
+        [Required(ErrorMessage = "Asset Serial Number is required.")]
+        public string AssetSerialNumber { get; set; }
+
 
         [Required(ErrorMessage = "From User ID is required.")]
         public Guid FromUserId { get; set; }
@@ -12,10 +13,10 @@
         public Guid ToUserId { get; set; }
 
         [Required(ErrorMessage = "From Location ID is required.")]
-        public int FromLocationId { get; set; }
+        public string FromLocationBarcode { get; set; }
 
         [Required(ErrorMessage = "To Location ID is required.")]
-        public int ToLocationId { get; set; }
+        public string ToLocationBarcode { get; set; }
 
         
     }

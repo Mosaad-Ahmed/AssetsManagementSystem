@@ -28,7 +28,11 @@
 
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
         [FutureDate("PurchaseDate", ErrorMessage = "Warranty expiry date must be after the purchase date.")]
-        public DateOnly? WarrantyExpiryDate { get; set; }
+        public DateOnly WarrantyExpiryDate { get; set; }
+
+
+        [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
+        public DateOnly DepreciationDate { get; set; }
 
 
         [Required(ErrorMessage = "Asset status is required.")]

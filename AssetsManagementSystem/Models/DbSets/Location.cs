@@ -2,6 +2,7 @@
 {
     public class Location:BaseWithAuditEntity
     {
+        public string Barcode { get; set; }
 
         [Required(ErrorMessage = "Location name is required.")]
         [MaxLength(200, ErrorMessage = "Location name cannot exceed 200 characters.")]

@@ -21,29 +21,31 @@ namespace AssetsManagementSystem.Services.AssetTransfer
         #region Location to Location Transfer
         public async Task<GetAssetTransferRecordResponseDTO> TransferLocationToLocationAsync(LocationToLocationTransferDTO dto)
          {
-            await ValidateLocationTransfer(dto.FromLocationId, dto.ToLocationId);
-
-            Location location = await UnitOfWork.readRepository<Models.DbSets.Location>().GetAsync(predicate: l => l.Id == dto.ToLocationId &&
-           (l.IsDeleted == false || l.IsDeleted == null));
-
-            if (location is null)
+            var fromlocation = await UnitOfWork.readRepository<Location>().GetAsync(l => l.Barcode == dto.FromLocationBarcode);
+            var Tolocation = await UnitOfWork.readRepository<Location>().GetAsync(l => l.Barcode == dto.ToLocationBarcode&&
+                                                                    (l.IsDeleted == false || l.IsDeleted == null));
+            if (Tolocation is null)
                 throw new InvalidOperationException("Cannot transfer asset to the Deleted or not found location.");
+             
 
 
+            await ValidateLocationTransfer(fromlocation.Id, Tolocation.Id);
+              
 
-            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == dto.AssetId &&
+
+            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.SerialNumber == dto.AssetSerialNumber &&
                                                                            (a.IsDeleted==false || a.IsDeleted==null)&&
                                                                             a.Status!=AssetStatus.Retired.ToString()&&
-                                                                            a.LocationId==dto.FromLocationId);
+                                                                            a.LocationId==fromlocation.Id);
 
             if (asset == null) throw new KeyNotFoundException("Asset not found or has deleted.");
              
 
             var transferRecord = new AssetTransferRecords
             {
-                AssetId = dto.AssetId,
-                FromLocationId = dto.FromLocationId,
-                ToLocationId = dto.ToLocationId,
+                AssetId = asset.Id,
+                FromLocationId = fromlocation.Id,
+                ToLocationId = Tolocation.Id,
                 FromUserId = asset.AssignedUserId,
                 ToUserId = asset.AssignedUserId,
                 Status = TransferStatus.Approved.ToString(),
@@ -56,7 +58,7 @@ namespace AssetsManagementSystem.Services.AssetTransfer
             try
             {
                 await UnitOfWork.writeRepository<AssetTransferRecords>().AddAsync(transferRecord);
-                asset.LocationId = dto.ToLocationId;
+                asset.LocationId = Tolocation.Id;
                 asset.UpdatedDate = DateTime.Now;
                 await UnitOfWork.writeRepository<Asset>().UpdateAsync(asset.Id, asset);
 
@@ -84,17 +86,19 @@ namespace AssetsManagementSystem.Services.AssetTransfer
                 throw new InvalidOperationException("Cannot transfer asset to the Deleted or not found User.");
 
 
-            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == dto.AssetId &&
+            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.SerialNumber == dto.AssetSerialNumber &&
                                                                            (a.IsDeleted == false || a.IsDeleted == null) &&
                                                                             a.Status != AssetStatus.Retired.ToString()&&
                                                                             a.AssignedUserId==dto.FromUserId
                                                                             );
 
+            
+
             if (asset == null) throw new KeyNotFoundException("Asset not found or has deleted.");
 
             var transferRecord = new AssetTransferRecords
             {
-                AssetId = dto.AssetId,
+                AssetId = asset.Id,
                 FromUserId = dto.FromUserId,
                 ToUserId = dto.ToUserId,
                 FromLocationId=asset.LocationId,
@@ -127,20 +131,25 @@ namespace AssetsManagementSystem.Services.AssetTransfer
         public async Task<GetAssetTransferRecordResponseDTO> TransferUserAndLocationAsync(UserAndLocationTransferDTO dto)
         {
             ValidateUserTransfer(dto.FromUserId, dto.ToUserId);
-            ValidateLocationTransfer(dto.FromLocationId, dto.ToLocationId);
 
-            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.Id == dto.AssetId &&
+            var fromlocation = await UnitOfWork.readRepository<Location>().GetAsync(l => l.Barcode == dto.FromLocationBarcode);
+            var Tolocation = await UnitOfWork.readRepository<Location>().GetAsync(l => l.Barcode == dto.ToLocationBarcode &&
+                                                                    (l.IsDeleted == false || l.IsDeleted == null));
+
+            await ValidateLocationTransfer(fromlocation.Id, Tolocation.Id);
+
+            var asset = await UnitOfWork.readRepository<Asset>().GetAsync(a => a.SerialNumber == dto.AssetSerialNumber &&
                                                                            (a.IsDeleted == false || a.IsDeleted == null) &&
                                                                             a.Status != AssetStatus.Retired.ToString());
             if (asset == null) throw new KeyNotFoundException("Asset not found or deleted.");
 
             var transferRecord = new AssetTransferRecords
             {
-                AssetId = dto.AssetId,
+                AssetId = asset.Id,
                 FromUserId = dto.FromUserId,
                 ToUserId = dto.ToUserId,
-                FromLocationId = dto.FromLocationId,
-                ToLocationId = dto.ToLocationId,
+                FromLocationId = fromlocation.Id,
+                ToLocationId = Tolocation.Id,
                 Status = TransferStatus.Pending.ToString(),
                 AddedOnDate =DateTime.Now
             };
@@ -424,8 +433,14 @@ namespace AssetsManagementSystem.Services.AssetTransfer
             if (transferRecord == null) throw new KeyNotFoundException("Transfer record not found.");
 
 
+             var Tolocation = await UnitOfWork.readRepository<Location>().GetAsync(l => l.Barcode == dto.ToLocationBarcode&&
+                                                                    (l.IsDeleted == false || l.IsDeleted == null));
+
+ 
+
+
             await ValidateUserTransfer(transferRecord.FromUserId, dto.ToUserId);
-            await ValidateLocationTransfer(transferRecord.FromLocationId, dto.ToLocationId);
+            await ValidateLocationTransfer(transferRecord.FromLocationId, Tolocation.Id);
 
             await UnitOfWork.BeginTransactionAsync();
             try
@@ -433,7 +448,7 @@ namespace AssetsManagementSystem.Services.AssetTransfer
                 transferRecord.FromUserId = transferRecord.FromUserId;
                 transferRecord.ToUserId = dto.ToUserId;
                 transferRecord.FromLocationId = transferRecord.FromLocationId;
-                transferRecord.ToLocationId = dto.ToLocationId;
+                transferRecord.ToLocationId = Tolocation.Id;
                 transferRecord.Status = TransferStatus.Pending.ToString();  
 
                 await UnitOfWork.writeRepository<AssetTransferRecords>().UpdateAsync(transferRecord.Id, transferRecord);

@@ -21,6 +21,8 @@ namespace AssetsManagementSystem.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Auditor")]
+
         public async Task<IActionResult> AddDataConsistencyCheckRecord(AddDataConsistencyCheckRequestDTO addDataConsistencyCheckRequestDTO)
         {
             try

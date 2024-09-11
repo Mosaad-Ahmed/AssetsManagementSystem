@@ -20,6 +20,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Add Document
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> AddDocument([FromForm] AddDocumentRequestDTO addDocumentDto)
         {
             try
@@ -45,6 +47,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Update Document
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> UpdateDocument(int id, [FromForm] UpdateDocumentRequestDTO updateDocumentDto)
         {
             try
@@ -75,6 +79,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Get Document by ID
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetDocumentById(int id)
         {
             try
@@ -98,6 +104,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region Delete Document
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> DeleteDocument(int id)
         {
             try

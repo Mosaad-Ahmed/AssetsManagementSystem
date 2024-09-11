@@ -21,6 +21,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region AddCategory 
         [HttpPost("add")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> AddCategory([FromBody] AddCategoryRequestDTO addCategoryRequest)
         {
             if (!ModelState.IsValid)
@@ -50,6 +52,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region GetCategoryById
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetCategoryById(int id)
         {
             if (id <= 0)
@@ -79,6 +83,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region GetAllCategories
         [HttpGet("all")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetAllCategories()
         {
             try
@@ -97,6 +103,8 @@ namespace AssetsManagementSystem.Controllers
 
         #region UpdateCategory
         [HttpPut("update/{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> UpdateCategory(int id, [FromBody] UpdateCategoryRequestDTO updateCategoryRequest)
         {
             if (!ModelState.IsValid)
@@ -138,6 +146,8 @@ namespace AssetsManagementSystem.Controllers
         #region DeleteCategory
 
         [HttpDelete("delete/{id:int}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> DeleteCategory(int id)
         {
             if (id <= 0)

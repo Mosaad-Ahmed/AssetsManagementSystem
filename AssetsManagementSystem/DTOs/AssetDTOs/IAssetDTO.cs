@@ -28,7 +28,7 @@ namespace AssetsManagementSystem.DTOs.AssetDTOs
 
 
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]
-        public DateOnly? WarrantyExpiryDate { get; set; }
+        public DateOnly WarrantyExpiryDate { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         [DefaultValue(AssetStatus.Active)]

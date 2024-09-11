@@ -5,7 +5,7 @@ namespace AssetsManagementSystem.DTOs.AssetDisposalDTOs
     public class AddAssetDisposalRecordDTO
     {
         [Required(ErrorMessage = "Asset ID is required.")]
-        public int AssetId { get; set; }
+        public string AssetSerialNumber { get; set; }
 
         [Required(ErrorMessage = "Disposal date is required.")]
         [DataType(DataType.Date, ErrorMessage = "Invalid date format.")]

@@ -20,6 +20,8 @@ namespace AssetsManagementSystem.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> AddSubCategory([FromBody] AddSubCategoryRequestDTO dto)
         {
             if (!ModelState.IsValid)
@@ -47,6 +49,8 @@ namespace AssetsManagementSystem.Controllers
 
          
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetSubCategoryById(int id)
         {
             try
@@ -68,6 +72,8 @@ namespace AssetsManagementSystem.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
         public async Task<IActionResult> GetAllSubCategories()
         {
             try
@@ -86,6 +92,8 @@ namespace AssetsManagementSystem.Controllers
          
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> UpdateSubCategory(int id, [FromBody] UpdateSubCategoryRequestDTO dto)
         {
             if (!ModelState.IsValid)
@@ -118,6 +126,8 @@ namespace AssetsManagementSystem.Controllers
 
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> DeleteSubCategory(int id)
         {
             try

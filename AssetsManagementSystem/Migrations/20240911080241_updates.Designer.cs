@@ -4,6 +4,7 @@ using AssetsManagementSystem.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AssetsManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240911080241_updates")]
+    partial class updates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -492,9 +495,6 @@ namespace AssetsManagementSystem.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -576,28 +576,28 @@ namespace AssetsManagementSystem.Migrations
                         new
                         {
                             Id = new Guid("fc05f613-0e97-444e-b19b-018a223a7484"),
-                            ConcurrencyStamp = "4335cba7-14f4-4b33-8bd4-1149a318ab23",
+                            ConcurrencyStamp = "9a90f48e-c43a-45c2-b80a-7c2dc9176917",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"),
-                            ConcurrencyStamp = "ea3413b5-fa77-4648-807c-79f36fd6850c",
+                            ConcurrencyStamp = "b9bdafc8-763b-47df-9c57-7c6af798f551",
                             Name = "User",
                             NormalizedName = "USER"
                         },
                         new
                         {
                             Id = new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"),
-                            ConcurrencyStamp = "54a5a7ef-5f31-4307-8859-e98b4bbe011f",
+                            ConcurrencyStamp = "7d937483-51de-4e3c-92e9-265fd047a823",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = new Guid("62474474-f91b-483d-b0d8-2742c01146f0"),
-                            ConcurrencyStamp = "87ae7d73-10d7-48f2-8e53-4be33ce74f53",
+                            ConcurrencyStamp = "2d82efcb-ea78-486f-8388-f404105e8c4f",
                             Name = "Auditor",
                             NormalizedName = "AUDITOR"
                         });
@@ -785,8 +785,8 @@ namespace AssetsManagementSystem.Migrations
                         {
                             Id = new Guid("bdabcf06-a956-4ef7-8045-3214e68b9b4c"),
                             AccessFailedCount = 0,
-                            AddedOnDate = new DateTime(2024, 9, 11, 14, 25, 20, 930, DateTimeKind.Local).AddTicks(1945),
-                            ConcurrencyStamp = "3f8b4c2b-5fd9-4e9e-bc66-6a7265bd6b8a",
+                            AddedOnDate = new DateTime(2024, 9, 11, 11, 2, 40, 549, DateTimeKind.Local).AddTicks(5522),
+                            ConcurrencyStamp = "edc157a6-69fc-4cda-8b7a-b981c914a04d",
                             Email = "Mosaad_Ahmed@Gmail.com",
                             EmailConfirmed = false,
                             FirstName = "Mosaad",
@@ -794,10 +794,10 @@ namespace AssetsManagementSystem.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "MOSAAD_AHMED@GMAIL.COM",
                             NormalizedUserName = "MOSAAD_AHMED@GMAIL.COM",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPVqfWm+hnHVbUIsUgyBH6b6UqelkGbQG4QgVRiKLYIRtw2WmrjJ2E8DAq/dzy6ghA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBD6qscKWLU/+YHWk2BOmXtoDuA1/34sS5YSXtrrDwScJv5svAxe2fjrE5g+b8/nxg==",
                             PhoneNumber = "01551251116",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "f4bac057-c293-441b-90ef-41b8d31d2298",
+                            SecurityStamp = "68f32ced-5ab5-4ce9-8949-18df26fe5f23",
                             TwoFactorEnabled = false,
                             UserName = "Mosaad_Ahmed@Gmail.com",
                             UserStatus = "Active"
