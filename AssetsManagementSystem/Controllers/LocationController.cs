@@ -100,8 +100,30 @@
 
         #endregion
 
+        #region GetByPaginationLocations
+
+        [HttpGet("ByPagination")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
+        public async Task<IActionResult> GetLocationsByPagination(int currentPage, int pageSize)
+        {
+            try
+            {
+                var locations = await _locationService.GetAllByPaginationLocationsAsync(currentPage, pageSize);
+                _logger.LogInformation("All locations retrieved successfully.");
+                return Ok(locations);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving all locations.");
+                return StatusCode(500, new { Error = "An error occurred while retrieving the locations", Details = ex.Message });
+            }
+        }
+
+        #endregion
+
         #region UpdateLocation
-         
+
         [HttpPut("update/{locationBarcode}")]
         [Authorize(Roles = "Admin,Manager")]
 

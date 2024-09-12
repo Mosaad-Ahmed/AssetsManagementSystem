@@ -110,6 +110,18 @@ namespace AssetsManagementSystem.Services.AssetMaintenance
 
 
 
+        public async Task<IList<GetAssetMaintenanceRecordDTO>> GetAllByPaginationMaintenanceRecordsAsync(int currentPage = 1, int pageSize = 10)
+        {
+            var maintenanceRecords = await UnitOfWork.readRepository<AssetMaintenanceRecords>()
+                                                      .GetAllByPagningAsync(predicate: m => (m.IsDeleted == false || m.IsDeleted == null),
+                                                                    pageSize: pageSize, currentPage: currentPage);
+
+            var maintenanceDtos = Mapper.Map<GetAssetMaintenanceRecordDTO, AssetMaintenanceRecords>(maintenanceRecords);
+            return maintenanceDtos;
+        }
+
+
+
         public async Task UpdateMaintenanceRecordAsync(UpdateAssetMaintenanceRecordDTO maintenanceDto)
         {
             //   Verify that the maintenance record exists

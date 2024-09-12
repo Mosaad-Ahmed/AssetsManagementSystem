@@ -66,7 +66,27 @@ namespace AssetsManagementSystem.Controllers
             }
         }
         #endregion
-          
+
+
+        #region GET: api/Supplier
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
+        public async Task<IActionResult> GetSuppliersByPagination(int currentPage, int pageSize)
+        {
+            try
+            {
+                var suppliers = await _supplierService.GetAllByPaginationSuppliersAsync(currentPage, pageSize);
+                return Ok(suppliers);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving suppliers.");
+                return StatusCode(500, new { Error = "An error occurred while retrieving the suppliers.", Details = ex.Message });
+            }
+        }
+        #endregion
+
         #region POST: api/Supplier
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]

@@ -74,6 +74,21 @@ namespace AssetsManagementSystem.Services.Categories
         }
         #endregion
 
+        #region Retrieve all categories
+        public async Task<IEnumerable<GetCategoryRequestDTO>> GetAllByPaginationCategoriesAsync(int currentPage = 1, int pageSize = 10)
+        {
+            var categories = await UnitOfWork.readRepository<Category>()
+                .GetAllByPagningAsync(predicate: c => (c.IsDeleted == false || c.IsDeleted == null), pageSize: pageSize, currentPage: currentPage);
+
+            var getCategoryRequestDTOs = Mapper.Map<GetCategoryRequestDTO, Category>(categories);
+
+            return getCategoryRequestDTOs;
+
+        }
+        #endregion
+
+
+
         #region Update a category
         public async Task UpdateCategoryAsync(int categoryId, UpdateCategoryRequestDTO updateCategoryRequest)
         {

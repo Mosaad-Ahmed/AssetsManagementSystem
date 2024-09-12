@@ -89,7 +89,26 @@ namespace AssetsManagementSystem.Controllers
             }
         }
 
-         
+
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
+        public async Task<IActionResult> GetSubCategoriesByPagination(int currentPage, int pageSize)
+        {
+            try
+            {
+                var result = await _subCategoryService.GetAllByPaginationSubCategoriesAsync(currentPage, pageSize);
+                _logger.LogInformation("All subcategories retrieved successfully.");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving all subcategories.");
+                return StatusCode(500, "Internal server error.");
+            }
+        }
+
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Manager")]

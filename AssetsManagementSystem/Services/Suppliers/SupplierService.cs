@@ -75,6 +75,20 @@ namespace AssetsManagementSystem.Services.Suppliers
         }
         #endregion
 
+        #region Retrieve all suppliers
+        public async Task<IEnumerable<GetSupplierRequestDTO>> GetAllByPaginationSuppliersAsync(int currentPage = 1, int pageSize = 10)
+        {
+            var Suppliers = await UnitOfWork.readRepository<Supplier>()
+                 .GetAllByPagningAsync(predicate: s => (s.IsDeleted == false || s.IsDeleted == null), pageSize: pageSize, currentPage: currentPage);
+
+            var getSupplierRequestDTOs =
+                Mapper.Map<GetSupplierRequestDTO, Supplier>(Suppliers);
+
+            return getSupplierRequestDTOs;
+
+        }
+        #endregion
+
         #region Update a supplier
         public async Task UpdateSupplierAsync(int supplierId, UpdateSupplierRequestDTO updateSupplierRequest)
         {

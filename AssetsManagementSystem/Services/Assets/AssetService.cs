@@ -1,4 +1,6 @@
-﻿namespace AssetsManagementSystem.Services.Assets
+﻿using AssetsManagementSystem.Models.DbSets;
+
+namespace AssetsManagementSystem.Services.Assets
 {
     public class AssetService : BaseClassForServices
     {
@@ -6,6 +8,44 @@
             : base(unitOfWork, mapper, httpContextAccessor)
         {
         }
+
+
+
+        public async Task<List<GetAssetResponseDTO>> GetAssetsForCurrentUser() 
+        {
+                        
+            var currentUser =Guid.Parse(UserId);
+            
+            var assets=await UnitOfWork.readRepository<Asset>().GetAllAsync(predicate:a=>a.AssignedUserId==currentUser
+                                                                                                        &&
+                                                                                                        (a.IsDeleted==false||a.IsDeleted==null)
+                                                                                                        );
+
+
+            var getAssetResponseDTO = assets.Select(a => new GetAssetResponseDTO()
+            {
+                Id = a.Id,
+                Name = a.Name,
+                ModelNumber = a.ModelNumber,
+                SerialNumber = a.SerialNumber,
+                PurchaseDate = a.PurchaseDate,
+                PurchasePrice = a.PurchasePrice,
+                WarrantyExpiryDate = a.WarrantyExpiryDate,
+                Status = a.Status,
+                dicription = a.dicription,
+                LocationName = a.Location.Name,
+                AssignedUserName = string.Concat(a.AssignedUser.FirstName, " ", a.AssignedUser.LastName),
+                CategoryName = a.Category?.Name,
+                SubCategoryName = a.AssetSubCategory?.Name,
+                SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
+                AddedOnDate = a.AddedOnDate,
+                UpdatedDate = a.UpdatedDate
+            }).ToList();
+
+            return getAssetResponseDTO;
+
+        }
+
 
         #region Add Asset
         public async Task<GetAssetResponseDTO> AddAssetAsync(AddAssetRequestDTO addAssetDto)
@@ -69,6 +109,7 @@
                 PurchasePrice = asset.PurchasePrice,
                 dicription=asset.dicription,
                 WarrantyExpiryDate = asset.WarrantyExpiryDate,
+                DepreciationDate=asset.DepreciationDate,
                 Status = asset.Status,
                 LocationName = asset.Location.Name,
                 AssignedUserName = string.Concat(asset.AssignedUser.FirstName, " ", asset.AssignedUser.LastName),
@@ -100,6 +141,7 @@
                 PurchaseDate = a.PurchaseDate,
                 PurchasePrice = a.PurchasePrice,
                 WarrantyExpiryDate = a.WarrantyExpiryDate,
+                DepreciationDate = a.DepreciationDate,
                 Status = a.Status,
                 dicription = a.dicription,
                 LocationName = a.Location.Name, 
@@ -114,6 +156,40 @@
             return getAssetResponseDTO;
         }
         #endregion
+
+
+        #region Get All Assets
+        public async Task<IList<GetAssetResponseDTO>> GetAllByPaginationAssetsAsync(int currentPage = 1, int pageSize = 10)
+        {
+            var assets = await UnitOfWork.readRepository<Asset>()
+                .GetAllByPagningAsync(predicate: (a => a.IsDeleted == false || a.IsDeleted == null), pageSize: pageSize, currentPage: currentPage);
+
+
+            var getAssetResponseDTO = assets.Select(a => new GetAssetResponseDTO()
+            {
+                Id = a.Id,
+                Name = a.Name,
+                ModelNumber = a.ModelNumber,
+                SerialNumber = a.SerialNumber,
+                PurchaseDate = a.PurchaseDate,
+                PurchasePrice = a.PurchasePrice,
+                WarrantyExpiryDate = a.WarrantyExpiryDate,
+                DepreciationDate = a.DepreciationDate,
+                Status = a.Status,
+                dicription = a.dicription,
+                LocationName = a.Location.Name,
+                AssignedUserName = string.Concat(a.AssignedUser.FirstName, " ", a.AssignedUser.LastName),
+                CategoryName = a.Category?.Name,
+                SubCategoryName = a.AssetSubCategory?.Name,
+                SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
+                AddedOnDate = a.AddedOnDate,
+                UpdatedDate = a.UpdatedDate
+            }).ToList();
+
+            return getAssetResponseDTO;
+        }
+        #endregion
+
 
         #region Update Asset
         public async Task<GetAssetResponseDTO> UpdateAssetAsync(string serialNumber, UpdateAssetRequestDTO updateAssetDto)

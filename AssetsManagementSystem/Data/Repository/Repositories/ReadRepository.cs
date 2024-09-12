@@ -40,7 +40,7 @@ namespace AssetsManagementSystem.Data.Repository.Repositories
         public async Task<IList<T>> GetAllByPagningAsync(Expression<Func<T, bool>>? predicate = null,
                                                   Func<IQueryable<T>, IIncludableQueryable<T, object>>? include = null,
                                                   Func<IQueryable<T>, IOrderedQueryable<T>>? orderby = null,
-                                                  int currentPage = 1, int pageSize = 3,
+                                                  int currentPage = 1, int pageSize = 10,
                                                   bool enableTracing = false)
         {
             IQueryable<T> Queryable = entity;

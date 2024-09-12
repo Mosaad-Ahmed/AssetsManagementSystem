@@ -381,6 +381,54 @@ namespace AssetsManagementSystem.Services.AssetTransfer
         }
         #endregion
 
+        #region Get All By Pagination Asset Transfers
+        public async Task<IList<GetAssetTransferRecordResponseDTO>> GetAllByPaginationAssetTransfersAsync(int currentPage = 1, int pageSize = 10)
+        {
+            var transferRecords = await UnitOfWork.readRepository<AssetTransferRecords>()
+                .GetAllByPagningAsync(predicate: tr => (tr.IsDeleted == null || tr.IsDeleted == false), pageSize: pageSize, currentPage: currentPage);
+
+            var getAssetTransferRecordResponseDTO = transferRecords.Select
+                (
+                tr => {
+                    var transferRecord = new GetAssetTransferRecordResponseDTO
+                    {
+                        Id = tr.Id,
+                        AssetId = tr.AssetId,
+                        AssetName = tr.Asset.Name,
+
+                        FromUserId = tr.FromUserId,
+                        FromUserName = tr.FromUser != null ? tr.FromUser.UserName : string.Empty,
+
+                        ToUserId = tr.ToUserId,
+                        ToUserName = tr.ToUser != null ? string.Concat(tr.ToUser.FirstName, tr.ToUser.LastName) : string.Empty,
+
+                        FromLocationId = tr.FromLocationId,
+                        FromLocationName = tr.FromLocation != null ? string.Concat(tr.FromUser.FirstName, tr.FromUser.LastName) : string.Empty,
+
+                        ToLocationId = tr.ToLocationId,
+                        ToLocationName = tr.ToLocation != null ? tr.ToLocation.Name : string.Empty,
+
+                        Status = tr.Status,
+                        ApprovalDate = tr.ApprovalDate.HasValue ? tr.ApprovalDate : null,
+                        RejectionReason = tr.RejectionReason,
+
+                        AddedOnDate = tr.AddedOnDate,
+                        UpdatedDate = tr.UpdatedDate,
+                        IsUserTransfer = tr.IsUserTransfer
+                    };
+
+                    return transferRecord;
+                }
+                ).ToList();
+
+
+
+
+            return getAssetTransferRecordResponseDTO;
+        }
+        #endregion
+
+
         #region Update User to User Transfer
         public async Task<GetAssetTransferRecordResponseDTO> UpdateUserToUserTransferAsync(int id, UpdateUserToUserTransferDTO dto)
         {

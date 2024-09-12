@@ -58,6 +58,27 @@
         }
         #endregion
 
+        #region Get Asset by Current User
+        [HttpGet()]
+        [Authorize(Roles = "User,Manager")]
+        public async Task<IActionResult> GetAssetForCurrentUser()
+        {
+            try
+            {
+                 var result = await _assetService.GetAssetsForCurrentUser();
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { error = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                 return BadRequest(new { error = ex.Message });
+            }
+        }
+        #endregion
+
         #region Get All Assets
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Auditor")]
@@ -68,6 +89,26 @@
             {
                 _logger.LogInformation("Fetching all assets.");
                 var result = await _assetService.GetAllAssetsAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching all assets.");
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+        #endregion
+
+        #region Get All Assets ByPagination
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
+        public async Task<IActionResult> GetAssetsByPagination(int currentPage , int pageSize )
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all assets.");
+                var result = await _assetService.GetAllByPaginationAssetsAsync(currentPage,pageSize);
                 return Ok(result);
             }
             catch (Exception ex)

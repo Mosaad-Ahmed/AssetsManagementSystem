@@ -10,6 +10,8 @@
         public DateOnly PurchaseDate { get; set; }
         public decimal PurchasePrice { get; set; }
         public DateOnly? WarrantyExpiryDate { get; set; }
+         public DateOnly DepreciationDate { get; set; }
+
         public string Status { get; set; }
         public string LocationName { get; set; }
         public string AssignedUserName { get; set; }

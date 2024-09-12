@@ -130,7 +130,23 @@ namespace AssetsManagementSystem.Services.SubCategory
             return getSubCategoryRequestDTO;
         }
 
+        public async Task<IList<GetSubCategoryRequestDTO>> GetAllByPaginationSubCategoriesAsync(int currentPage = 1, int pageSize = 10)
+        {
+            var subCategories = await UnitOfWork.readRepository<Models.DbSets.SubCategory>()
+                .GetAllByPagningAsync(predicate: sc => (sc.IsDeleted == false || sc.IsDeleted == null), pageSize: pageSize, currentPage: currentPage);
 
+            var getSubCategoryRequestDTO = Mapper.Map<GetSubCategoryRequestDTO, Models.DbSets.SubCategory>(subCategories);
+
+
+            foreach (var item in getSubCategoryRequestDTO)
+            {
+                item.MainCategoryName = subCategories.Where(sc => item.MainCategoryId == sc.MainAssetCategory.Id)
+                                            .Select(sc => sc.MainAssetCategory.Name).FirstOrDefault();
+
+            }
+
+            return getSubCategoryRequestDTO;
+        }
 
 
 

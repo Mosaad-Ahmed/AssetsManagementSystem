@@ -83,6 +83,28 @@ namespace AssetsManagementSystem.Controllers
             }
         }
 
+        [HttpGet("GetByPaginationDisposalRecords")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
+        public async Task<IActionResult> GetByPaginationDisposalRecords(int currentPage, int pageSize)
+        {
+            try
+            {
+                var disposalRecords = await _assetDisposalService.GetAllByPaginationAssetDisposalRecordsAsync(currentPage, pageSize);
+
+                if (disposalRecords == null || disposalRecords.Count == 0)
+                {
+                    return NotFound(new { message = "No disposal records found." });
+                }
+
+                return Ok(disposalRecords);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred. Please try again later." });
+            }
+        }
+
 
         [Authorize(Roles = "Admin,Manager")]
         [HttpPut("UpdateDisposalRecord")]

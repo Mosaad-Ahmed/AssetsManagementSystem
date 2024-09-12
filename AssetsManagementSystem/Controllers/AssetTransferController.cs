@@ -304,5 +304,25 @@ namespace AssetsManagementSystem.Controllers
             }
         }
         #endregion
+
+        #region Get By Pagination Asset Transfers
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+
+        public async Task<IActionResult> GetAssetTransfersByPagination(int currentPage, int pageSize)
+        {
+            try
+            {
+                var result = await _assetTransferService.GetAllByPaginationAssetTransfersAsync(currentPage, pageSize);
+                _logger.LogInformation("All asset transfers retrieved successfully.");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving all asset transfers.");
+                return StatusCode(500, "Internal server error.");
+            }
+        }
+        #endregion
     }
 }

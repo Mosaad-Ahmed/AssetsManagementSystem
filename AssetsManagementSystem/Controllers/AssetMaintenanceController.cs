@@ -99,6 +99,31 @@ namespace AssetsManagementSystem.Controllers
             }
         }
 
+        [HttpGet("GetByPaginationMaintenanceRecords")]
+        [Authorize(Roles = "Admin,Manager,Auditor")]
+        public async Task<IActionResult> GetByPaginationMaintenanceRecords(int currentPage, int pageSize)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all maintenance records.");
+
+                var maintenanceRecords = await _assetMaintenanceService.GetAllByPaginationMaintenanceRecordsAsync(currentPage, pageSize);
+
+                if (maintenanceRecords == null || maintenanceRecords.Count == 0)
+                {
+                    _logger.LogWarning("No maintenance records found.");
+                    return NotFound(new { message = "No maintenance records found." });
+                }
+
+                _logger.LogInformation("Successfully fetched all maintenance records.");
+                return Ok(maintenanceRecords);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching all maintenance records.");
+                return StatusCode(500, new { message = "An unexpected error occurred. Please try again later." });
+            }
+        }
 
 
         [HttpPut("UpdateMaintenanceRecord")]

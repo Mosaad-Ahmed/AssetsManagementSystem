@@ -76,6 +76,28 @@
             return disposalRecordsDto;
         }
 
+        public async Task<IList<GetAssetDisposalRecordDTO>> GetAllByPaginationAssetDisposalRecordsAsync(int currentPage = 1, int pageSize = 10)
+        {
+            var disposalRecords = await UnitOfWork.readRepository<AssetDisposalRecord>()
+                                                   .GetAllByPagningAsync(predicate:d =>(d.IsDeleted == false || d.IsDeleted == null),
+                                                                                                pageSize:pageSize,currentPage:currentPage);
+
+            var disposalRecordsDto = disposalRecords.Select(d => new GetAssetDisposalRecordDTO
+            {
+                Id = d.Id,
+                AssetId = d.AssetId,
+                AssetName = d.Asset.Name,
+                Reason = d.Reason,
+                Method = d.Method,
+                ApprovedById = d.ApprovedById,
+                ApprovedByName = d.ApprovedBy.UserName,
+                AddedOnDate = d.AddedOnDate,
+                UpdatedDate = d.UpdatedDate
+            }).ToList();
+
+            return disposalRecordsDto;
+        }
+
         public async Task<GetAssetDisposalRecordDTO> GetAssetDisposalRecordByIdAsync(int disposalRecordId)
         {
             var disposalRecord = await UnitOfWork.readRepository<AssetDisposalRecord>()

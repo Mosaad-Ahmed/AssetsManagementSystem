@@ -73,6 +73,21 @@ namespace AssetsManagementSystem.Services.Locations
         }
         #endregion
 
+
+        #region Retrieve all locations
+        public async Task<IEnumerable<GetLocationRequestDTO>> GetAllByPaginationLocationsAsync(int currentPage = 1, int pageSize = 10)
+        {
+            var Locations = await UnitOfWork.readRepository<Location>()
+               .GetAllByPagningAsync(predicate: l => (l.IsDeleted == false || l.IsDeleted == null), pageSize: pageSize, currentPage: currentPage);
+
+            var GetLocationRequestDTOs = Mapper.Map<GetLocationRequestDTO, Location>(Locations);
+
+            return GetLocationRequestDTOs;
+        }
+        #endregion
+
+
+
         #region Update a location
         public async Task UpdateLocationAsync(string locationBarcode, UpdateLocationRequestDTO updateLocationRequest)
         {

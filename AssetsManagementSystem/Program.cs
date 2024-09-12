@@ -9,6 +9,7 @@ namespace AssetsManagementSystem
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            
             #region Add services to the container
 
             builder.Services.AddCors();
@@ -34,7 +35,7 @@ namespace AssetsManagementSystem
                .AddJsonOptions(config =>
                    config.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
             #endregion
-
+             
             #region Swagger Configuration
 
             builder.Services.AddSwaggerGen(c =>

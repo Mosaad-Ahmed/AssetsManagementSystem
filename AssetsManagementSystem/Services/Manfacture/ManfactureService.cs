@@ -38,7 +38,18 @@ namespace AssetsManagementSystem.Services.Manfacture
             }
             return Mapper.Map<GetManufacturerResponseDTO, Manufacturer>(Manfacure); ;
         }
-         
+
+        public async Task<IList<GetManufacturerResponseDTO>> GetAllByPaginationManfactureBtId(int currentPage = 1, int pageSize = 10)
+        {
+            var Manfacure = await UnitOfWork.readRepository<Manufacturer>().GetAllByPagningAsync(m =>m.IsDeleted == false , 
+                                                                pageSize: pageSize, currentPage: currentPage);
+            if (Manfacure is null)
+            {
+                throw new InvalidOperationException("This Manfacure Is not Exist ,may be deleted");
+            }
+            return Mapper.Map<GetManufacturerResponseDTO, Manufacturer>(Manfacure); ;
+        }
+
         public async Task UpdateManfacuture(int id,UpdateManufacturerRequestDTO updateManufacturerRequest)
         {
             var Manfacure = await UnitOfWork.readRepository<Manufacturer>().GetAsync(m => m.Id == id && m.IsDeleted == false);
