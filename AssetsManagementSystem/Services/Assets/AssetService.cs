@@ -1,4 +1,5 @@
-﻿using AssetsManagementSystem.Models.DbSets;
+﻿using AssetsManagementSystem.DTOs.AssetDTOs;
+using AssetsManagementSystem.Models.DbSets;
 
 namespace AssetsManagementSystem.Services.Assets
 {
@@ -36,8 +37,8 @@ namespace AssetsManagementSystem.Services.Assets
                 LocationName = a.Location.Name,
                 AssignedUserName = string.Concat(a.AssignedUser.FirstName, " ", a.AssignedUser.LastName),
                 CategoryName = a.Category?.Name,
-                SubCategoryName = a.AssetSubCategory?.Name,
-                SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
+                 SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
+                ManfactureName=a.Manufacturer.Name,
                 AddedOnDate = a.AddedOnDate,
                 UpdatedDate = a.UpdatedDate
             }).ToList();
@@ -66,7 +67,9 @@ namespace AssetsManagementSystem.Services.Assets
 
             await UnitOfWork.BeginTransactionAsync();
             try
-            {
+            { var realcategoryid = await UnitOfWork.readRepository<Category>()
+                    .GetAsync(c => c.SerialCode == addAssetDto.CategoryId.ToString());
+                asset.CategoryId =realcategoryid.Id;
                 await UnitOfWork.writeRepository<Asset>().AddAsync(asset);
            
                 await UnitOfWork.SaveChangeAsync();
@@ -114,8 +117,8 @@ namespace AssetsManagementSystem.Services.Assets
                 LocationName = asset.Location.Name,
                 AssignedUserName = string.Concat(asset.AssignedUser.FirstName, " ", asset.AssignedUser.LastName),
                 CategoryName = asset.Category.Name,
-                SubCategoryName = asset.AssetSubCategory.Name,
-                SupplierNames = asset.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
+                 SupplierNames = asset.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
+                ManfactureName = asset.Manufacturer.Name,
                 AddedOnDate = asset.AddedOnDate,
                 UpdatedDate = asset.UpdatedDate
             };
@@ -147,8 +150,8 @@ namespace AssetsManagementSystem.Services.Assets
                 LocationName = a.Location.Name, 
                 AssignedUserName =string.Concat(a.AssignedUser.FirstName," ",a.AssignedUser.LastName),
                 CategoryName = a.Category?.Name, 
-                SubCategoryName=a.AssetSubCategory?.Name,
-                SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),  
+                 SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
+                ManfactureName = a.Manufacturer.Name,
                 AddedOnDate = a.AddedOnDate,
                 UpdatedDate = a.UpdatedDate
             }).ToList();
@@ -180,8 +183,7 @@ namespace AssetsManagementSystem.Services.Assets
                 LocationName = a.Location.Name,
                 AssignedUserName = string.Concat(a.AssignedUser.FirstName, " ", a.AssignedUser.LastName),
                 CategoryName = a.Category?.Name,
-                SubCategoryName = a.AssetSubCategory?.Name,
-                SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
+                 SupplierNames = a.AssetsSuppliers.Select(s => s.Supplier.CompanyName).ToList(),
                 AddedOnDate = a.AddedOnDate,
                 UpdatedDate = a.UpdatedDate
             }).ToList();
@@ -231,8 +233,7 @@ namespace AssetsManagementSystem.Services.Assets
                 existingAsset.LocationId = updateAssetDto.LocationId;
                 existingAsset.AssignedUserId = updateAssetDto.AssignedUserId;
                 existingAsset.CategoryId = updateAssetDto.CategoryId;
-                existingAsset.SubCategoryId = updateAssetDto.SubCategoryId;
-                #endregion
+                 #endregion
 
 
                 existingAsset.UpdatedDate = DateTime.Now;
@@ -332,23 +333,23 @@ namespace AssetsManagementSystem.Services.Assets
                 throw new KeyNotFoundException("Assigned user not found.");
             }
 
-            if (await UnitOfWork.readRepository<Category>().GetAsync(c => c.Id == assetDto.CategoryId
+            if (await UnitOfWork.readRepository<Category>().GetAsync(c => c.SerialCode == assetDto.CategoryId.ToString()
             && (c.IsDeleted == false || c.IsDeleted == null)) == null)
             {
                 throw new KeyNotFoundException("Category not found.");
             }
 
-            var subCategory = await UnitOfWork.readRepository<Models.DbSets.SubCategory>().GetAsync(sc => sc.Id == assetDto.SubCategoryId
-            && (sc.IsDeleted == false || sc.IsDeleted == null));
-            if (subCategory == null)
-            {
-                throw new KeyNotFoundException("SubCategory not found.");
-            }
+            //var subCategory = await UnitOfWork.readRepository<Models.DbSets.SubCategory>().GetAsync(sc => sc.Id == assetDto.SubCategoryId
+            //&& (sc.IsDeleted == false || sc.IsDeleted == null));
+            //if (subCategory == null)
+            //{
+            //    throw new KeyNotFoundException("SubCategory not found.");
+            //}
 
-            if (subCategory.MainCategoryId != assetDto.CategoryId)
-            {
-                throw new InvalidOperationException("SubCategory does not belong to the selected MainCategory.");
-            }
+            //if (subCategory.MainCategoryId != assetDto.CategoryId)
+            //{
+            //    throw new InvalidOperationException("SubCategory does not belong to the selected MainCategory.");
+            //}
 
             foreach (var supplierId in assetDto.SupplierIds)
             {

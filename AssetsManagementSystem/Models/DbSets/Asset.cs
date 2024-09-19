@@ -60,10 +60,6 @@
         public virtual Category Category { get; set; }
 
 
-        [ForeignKey("AssetSubCategory")]
-        public int SubCategoryId { get; set; }
-        public virtual SubCategory AssetSubCategory { get; set; }
-
         [ForeignKey("Manufacturer")]
         public int ManufacturerId { get; set; }
         public virtual Manufacturer  Manufacturer { get; set; }

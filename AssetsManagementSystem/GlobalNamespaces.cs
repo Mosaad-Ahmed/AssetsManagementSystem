@@ -56,8 +56,8 @@ global using AssetsManagementSystem.Services.Categories;
 global using AssetsManagementSystem.Services.DataConsistencyCheck;
 global using AssetsManagementSystem.Services.Document;
 global using AssetsManagementSystem.Services.ReceiveMaintainedAsset;
-global using AssetsManagementSystem.Services.SubCategory;
 global using AssetsManagementSystem.Services.Suppliers;
+
 
 
 

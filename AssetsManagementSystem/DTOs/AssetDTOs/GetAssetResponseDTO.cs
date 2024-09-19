@@ -16,7 +16,8 @@
         public string LocationName { get; set; }
         public string AssignedUserName { get; set; }
         public string CategoryName { get; set; }
-        public string SubCategoryName { get; set; }
+        public string ManfactureName { get; set; }
+
         public ICollection<string> SupplierNames { get; set; }
         public DateTime AddedOnDate { get; set; }
         public DateTime? UpdatedDate { get; set; }

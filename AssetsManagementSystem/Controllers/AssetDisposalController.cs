@@ -12,7 +12,6 @@ namespace AssetsManagementSystem.Controllers
             _assetDisposalService = assetDisposalService;
         }
 
-        //[Authorize(Roles = "Manager, Admin")]
         [HttpPost("AddDisposalRecord")]
         [Authorize(Roles = "Admin,Manager")]
 
@@ -22,8 +21,8 @@ namespace AssetsManagementSystem.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-            try
+            
+            try 
             {
                 await _assetDisposalService.AddAssetDisposalRecordAsync(disposalDto);
                 return Ok(new { message = "Disposal record added successfully." });

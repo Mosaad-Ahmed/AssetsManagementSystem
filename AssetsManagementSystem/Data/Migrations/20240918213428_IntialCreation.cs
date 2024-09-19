@@ -62,25 +62,6 @@ namespace AssetsManagementSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuditLogs",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EventType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EntityName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EntityId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Changes = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PerformedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IPAddress = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AuditLogs", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Categories",
                 columns: table => new
                 {
@@ -88,6 +69,8 @@ namespace AssetsManagementSystem.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
+                    SerialCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ParentCategoryId = table.Column<int>(type: "int", nullable: true),
                     AddedOnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -96,6 +79,11 @@ namespace AssetsManagementSystem.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Categories_Categories_ParentCategoryId",
+                        column: x => x.ParentCategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -104,6 +92,7 @@ namespace AssetsManagementSystem.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Barcode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     AddedOnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -123,7 +112,8 @@ namespace AssetsManagementSystem.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Info = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Info = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -136,8 +126,11 @@ namespace AssetsManagementSystem.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    ContactInfo = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    CompanyName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    email = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AddedOnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -271,29 +264,6 @@ namespace AssetsManagementSystem.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SubCategory",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    MainCategoryId = table.Column<int>(type: "int", nullable: false),
-                    AddedOnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeletedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SubCategory", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SubCategory_Categories_MainCategoryId",
-                        column: x => x.MainCategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Assets",
                 columns: table => new
                 {
@@ -304,13 +274,13 @@ namespace AssetsManagementSystem.Migrations
                     SerialNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     PurchaseDate = table.Column<DateOnly>(type: "date", nullable: false),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    WarrantyExpiryDate = table.Column<DateOnly>(type: "date", nullable: true),
+                    WarrantyExpiryDate = table.Column<DateOnly>(type: "date", nullable: false),
+                    DepreciationDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     dicription = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
                     LocationId = table.Column<int>(type: "int", nullable: false),
                     AssignedUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CategoryId = table.Column<int>(type: "int", nullable: false),
-                    SubCategoryId = table.Column<int>(type: "int", nullable: false),
                     ManufacturerId = table.Column<int>(type: "int", nullable: false),
                     AddedOnDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -339,11 +309,6 @@ namespace AssetsManagementSystem.Migrations
                         name: "FK_Assets_Manufacturers_ManufacturerId",
                         column: x => x.ManufacturerId,
                         principalTable: "Manufacturers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Assets_SubCategory_SubCategoryId",
-                        column: x => x.SubCategoryId,
-                        principalTable: "SubCategory",
                         principalColumn: "Id");
                 });
 
@@ -569,16 +534,16 @@ namespace AssetsManagementSystem.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { new Guid("62474474-f91b-483d-b0d8-2742c01146f0"), "92619e99-30e9-4781-a248-466ec5925b44", "Auditor", "AUDITOR" },
-                    { new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"), "51cf6ed2-1fdd-4d16-8ae3-e60dd9568e26", "User", "USER" },
-                    { new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"), "40fbe03b-e655-4769-af08-bba3d2e9bdcc", "Manager", "MANAGER" },
-                    { new Guid("fc05f613-0e97-444e-b19b-018a223a7484"), "2845f0ee-23d9-49cc-bd0f-980ac4f8b388", "Admin", "ADMIN" }
+                    { new Guid("62474474-f91b-483d-b0d8-2742c01146f0"), "14d6061f-b887-4d8a-a6a4-c0d6da21c867", "Auditor", "AUDITOR" },
+                    { new Guid("846e3679-1537-487d-969c-3a6116fc3b2d"), "1470974e-8402-404c-9fbe-489d771bbaac", "User", "USER" },
+                    { new Guid("d9c0c478-adf7-40db-ade3-2b7810d9659f"), "1878a7de-b47e-40a7-8b30-4e543bf9df08", "Manager", "MANAGER" },
+                    { new Guid("fc05f613-0e97-444e-b19b-018a223a7484"), "03e86803-5f32-4797-bdfd-e37cb248a509", "Admin", "ADMIN" }
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetUsers",
                 columns: new[] { "Id", "AccessFailedCount", "AddedOnDate", "ConcurrencyStamp", "DeletedDate", "Email", "EmailConfirmed", "FirstName", "IsDeleted", "LastName", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "RefreshToken", "RefreshTokenExpiryTime", "SecurityStamp", "TwoFactorEnabled", "UpdatedDate", "UserName", "UserStatus" },
-                values: new object[] { new Guid("bdabcf06-a956-4ef7-8045-3214e68b9b4c"), 0, new DateTime(2024, 9, 9, 11, 30, 17, 720, DateTimeKind.Local).AddTicks(5973), "060da8b6-0adc-4a0c-a1e0-950e37fa569d", null, "Mosaad_Ahmed@Gmail.com", false, "Mosaad", null, "Ahmed", false, null, "MOSAAD_AHMED@GMAIL.COM", "MOSAAD_AHMED@GMAIL.COM", "AQAAAAIAAYagAAAAECBtM/B8ej6Zqp7KRI977AU/EvY8K9DBSy8HilwmyI3ZW1pJd2vo+XENK3xL6iDH9Q==", "01551251116", false, null, null, "6222157f-bf2a-49af-ba95-b3442dbb37ae", false, null, "Mosaad_Ahmed@Gmail.com", "Active" });
+                values: new object[] { new Guid("bdabcf06-a956-4ef7-8045-3214e68b9b4c"), 0, new DateTime(2024, 9, 19, 0, 34, 28, 354, DateTimeKind.Local).AddTicks(2161), "137332af-1262-477d-a963-108f3beadc28", null, "Mosaad_Ahmed@Gmail.com", false, "Mosaad", null, "Ahmed", false, null, "MOSAAD_AHMED@GMAIL.COM", "MOSAAD_AHMED@GMAIL.COM", "AQAAAAIAAYagAAAAEEJJ12BuMil+BPaRaU4IzvxOA8hidSYDSkW11HryL9AlQkbCnXv4U6W/9s0YdEwmiA==", "01551251116", false, null, null, "970c002b-a789-4239-b995-b70a362cf589", false, null, "Mosaad_Ahmed@Gmail.com", "Active" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -670,11 +635,6 @@ namespace AssetsManagementSystem.Migrations
                 column: "ManufacturerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Assets_SubCategoryId",
-                table: "Assets",
-                column: "SubCategoryId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_AssetsSuppliers_AssetId",
                 table: "AssetsSuppliers",
                 column: "AssetId");
@@ -703,6 +663,11 @@ namespace AssetsManagementSystem.Migrations
                 name: "IX_AssetTransferRecords_ToUserId",
                 table: "AssetTransferRecords",
                 column: "ToUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Categories_ParentCategoryId",
+                table: "Categories",
+                column: "ParentCategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataConsistencyChecks_PerformedById",
@@ -743,11 +708,6 @@ namespace AssetsManagementSystem.Migrations
                 name: "IX_ReceiveMaintainedAsset_UserRecieveDevFromSupplierId",
                 table: "ReceiveMaintainedAsset",
                 column: "UserRecieveDevFromSupplierId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SubCategory_MainCategoryId",
-                table: "SubCategory",
-                column: "MainCategoryId");
         }
 
         /// <inheritdoc />
@@ -781,9 +741,6 @@ namespace AssetsManagementSystem.Migrations
                 name: "AssetTransferRecords");
 
             migrationBuilder.DropTable(
-                name: "AuditLogs");
-
-            migrationBuilder.DropTable(
                 name: "DataConsistencyChecks");
 
             migrationBuilder.DropTable(
@@ -805,16 +762,13 @@ namespace AssetsManagementSystem.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
+                name: "Categories");
+
+            migrationBuilder.DropTable(
                 name: "Locations");
 
             migrationBuilder.DropTable(
                 name: "Manufacturers");
-
-            migrationBuilder.DropTable(
-                name: "SubCategory");
-
-            migrationBuilder.DropTable(
-                name: "Categories");
         }
     }
 }

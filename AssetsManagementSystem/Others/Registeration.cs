@@ -14,7 +14,7 @@ namespace AssetsManagementSystem.Others
             services.AddSingleton<Interfaces.IAutoMapper.IMapper, AutoMapper.Mapper>();
              services.AddSingleton<IFileService, FileService>();
 
-            #region Authenticationس
+            #region Authentication
             services.AddAuthentication
                 (
                 opt =>

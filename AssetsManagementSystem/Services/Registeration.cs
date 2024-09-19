@@ -22,8 +22,6 @@ namespace AssetsManagementSystem.Services
 
             services.AddScoped<AssetDisposalService>();
 
-            services.AddScoped<SubCategoryerService>();
-
             services.AddScoped<AssetTransferService>();
 
             services.AddScoped<DocumentService>();

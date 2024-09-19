@@ -49,13 +49,6 @@ namespace AssetsManagementSystem.DTOs.AssetDTOs
         [Required(ErrorMessage = "Category is required.")]
         public int CategoryId { get; set; }
 
-
-
-        [Required(ErrorMessage = "SubCategory is required.")]
-        public int SubCategoryId { get; set; }
-
-
-
         public ICollection<int> SupplierIds { get; set; }
     }
 }

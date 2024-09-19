@@ -28,15 +28,54 @@ namespace AssetsManagementSystem.Services.Categories
                 throw new InvalidOperationException("A category with the same name already exists.");
             }
 
-             var category = Mapper.Map<Category,AddCategoryRequestDTO>(addCategoryRequest);
-            
+              var category = Mapper.Map<Category,AddCategoryRequestDTO>(addCategoryRequest);
+           
               category.AddedOnDate=DateTime.Now;
+
+            var categoryforId = addCategoryRequest.ParentCategoryId == 0 ? null :
+                await UnitOfWork.readRepository<Category>().GetAsync(c => c.SerialCode == (addCategoryRequest.ParentCategoryId).ToString());
+
+             category.ParentCategoryId=categoryforId?.Id;
+
 
              await UnitOfWork.writeRepository<Category>().AddAsync(category);
 
              await UnitOfWork.SaveChangeAsync();
         }
         #endregion
+
+        #region GetMainCategory
+
+        public async Task<IList<GetCategoryRequestDTO>> GetMainCategory() 
+        {
+            var categories=await UnitOfWork.readRepository<Category>().GetAllAsync(predicate:c=>(c.ParentCategoryId==null||c.ParentCategoryId==0));
+
+            var getCategoriesRequestDTOs = Mapper.Map<GetCategoryRequestDTO, Category>(categories);
+
+            return getCategoriesRequestDTOs;
+            
+        }
+
+        #endregion
+
+
+
+        #region GetSubCategory
+        public async Task<IList<GetCategoryRequestDTO>> GetSubCategory(int parentId)
+        {
+            var categories = await UnitOfWork.readRepository<Category>().GetAllAsync(predicate: c => (c.IsDeleted == null || c.IsDeleted == false)
+                                                                            && c.ParentCategoryId==parentId);
+
+            var getCategoriesRequestDTOs = Mapper.Map<GetCategoryRequestDTO, Category>(categories);
+           
+
+            return getCategoriesRequestDTOs;
+
+        }
+
+        #endregion
+
+
 
         #region Retrieve a category by ID
         public async Task<GetCategoryRequestDTO> GetCategoryByIdAsync(int categoryId)
@@ -50,7 +89,7 @@ namespace AssetsManagementSystem.Services.Categories
                 .GetAsync(c => c.Id == categoryId && (c.IsDeleted == false || c.IsDeleted == null));
 
             var getCategoryRequestDTO = Mapper.Map<GetCategoryRequestDTO,Category>(category);
-
+            getCategoryRequestDTO.ParentCategoryName = category.ParentCategory.Name;
 
             if (category == null)
             {
@@ -67,10 +106,21 @@ namespace AssetsManagementSystem.Services.Categories
             var categories= await UnitOfWork.readRepository<Category>()
                 .GetAllAsync(predicate: c=> (c.IsDeleted == false || c.IsDeleted == null));
 
-            var getCategoryRequestDTOs = Mapper.Map<GetCategoryRequestDTO, Category>(categories);
-
+            var getCategoryRequestDTOs = categories.Select
+                (
+                c=>new GetCategoryRequestDTO()
+                {
+                    Id= c.Id,   
+                    Name= c.Name,
+                    SerialCode= c.SerialCode,
+                    ParentCategoryId= c.ParentCategoryId==null?null:c.ParentCategoryId,
+                    ParentCategoryName=c.ParentCategoryId==null?null:c.ParentCategory.Name,
+                    AddedOnDate=c.AddedOnDate,
+                    UpdatedDate=c.UpdatedDate
+                }
+                );
             return getCategoryRequestDTOs;
-
+            
         }
         #endregion
 
@@ -85,12 +135,11 @@ namespace AssetsManagementSystem.Services.Categories
             return getCategoryRequestDTOs;
 
         }
-        #endregion
-
-
+        #endregion 
 
         #region Update a category
-        public async Task UpdateCategoryAsync(int categoryId, UpdateCategoryRequestDTO updateCategoryRequest)
+        public async Task UpdateCategoryAsync(int categoryId, UpdateCategoryRequestDTO
+            updateCategoryRequest)
         {
             if (updateCategoryRequest == null)
             {
@@ -137,17 +186,10 @@ namespace AssetsManagementSystem.Services.Categories
             var category = await UnitOfWork.readRepository<Category>()
                                 .GetAsync(c => c.Id == categoryId && (c.IsDeleted == false || c.IsDeleted == null) );
 
-            var subcategory= await UnitOfWork.readRepository<Models.DbSets.SubCategory>()
-                                .GetAsync(sc=>sc.MainCategoryId==categoryId && (sc.IsDeleted == false || sc.IsDeleted == null));
-
-            if (subcategory is not null)
-            {
-                throw new InvalidOperationException("There are Subcategory dependent on this Category,Please Go and delete it first");
-            }
 
 
             var asset = await UnitOfWork.readRepository<Asset>()
-                               .GetAsync(A => A.SubCategoryId == categoryId && (A.IsDeleted == false || A.IsDeleted == null));
+                               .GetAsync(A => A.CategoryId == categoryId && (A.IsDeleted == false || A.IsDeleted == null));
 
             if (asset is not null)
             {

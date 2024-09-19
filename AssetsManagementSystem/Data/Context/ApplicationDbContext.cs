@@ -95,8 +95,7 @@
         public virtual DbSet<Supplier> Suppliers { get; set; }
         public virtual DbSet<DataConsistencyCheck> DataConsistencyChecks { get; set; }
         public virtual DbSet<Document> Documents { get; set; }
-        public virtual DbSet<AuditLog> AuditLogs { get; set; }
-        public virtual DbSet<Manufacturer> Manufacturers { get; set; }
+         public virtual DbSet<Manufacturer> Manufacturers { get; set; }
         public virtual DbSet<ReceiveMaintainedAsset> ReceiveMaintainedAsset { get; set; }
         #endregion
     }
