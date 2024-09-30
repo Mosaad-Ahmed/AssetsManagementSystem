@@ -12,7 +12,19 @@
           //  UserId = httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         }
- 
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer("Server=.;Database=AssetManagementSystem;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=True"
+        //        //                        , sqlServerOptions =>
+        //        //sqlServerOptions.EnableRetryOnFailure(
+        //        //    maxRetryCount: 0, // Number of retry attempts
+        //        //    maxRetryDelay: TimeSpan.FromSeconds(10), // Delay between retries
+        //        //    errorNumbersToAdd: null // Optional: SQL error numbers to trigger a retry
+        //        //)
+        //    );
+        //}
+       
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

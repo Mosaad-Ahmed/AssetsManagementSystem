@@ -76,10 +76,14 @@ namespace AssetsManagementSystem
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
             {
                 app.UseSwagger();
-                app.UseSwaggerUI();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Asset Management System API v1");
+                    //c.RoutePrefix = string.Empty; // To access Swagger directly from the root
+                });
             }
 
             app.UseHttpsRedirection();

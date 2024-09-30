@@ -1,4 +1,6 @@
-﻿namespace AssetsManagementSystem.Data
+﻿using Microsoft.Extensions.Options;
+
+namespace AssetsManagementSystem.Data
 {
     public static class Registeration
     {
@@ -8,9 +10,15 @@
             services.AddDbContext<ApplicationDbContext>(
                 opt =>
                 {
-                    opt.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
-                 
-                 }
+                   // opt.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
+                    opt.UseLazyLoadingProxies().UseSqlServer(configuration.GetConnectionString("DefaultConnection")/*
+                                                                                                                    , sqlServerOptions =>
+                  sqlServerOptions.EnableRetryOnFailure(
+                      maxRetryCount: 5, // Number of retry attempts
+                      maxRetryDelay: TimeSpan.FromSeconds(10), // Delay between retries
+                      errorNumbersToAdd: null // Optional: SQL error numbers to trigger a retry
+                  )*/ );
+                }
           );
              
             services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));

@@ -27,7 +27,7 @@ namespace AssetsManagementSystem.Controllers
 
         #region AddCategory 
         [HttpPost("add")]
-       // [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin,Manager")]
 
         public async Task<IActionResult> AddCategory([FromBody] AddCategoryRequestDTO addCategoryRequest)
         {

@@ -86,7 +86,7 @@ namespace AssetsManagementSystem.Controllers
 
         #region Get All Assets
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,Auditor")]
+        //[Authorize(Roles = "Admin,Manager,Auditor")]
 
         public async Task<IActionResult> GetAllAssets()
         {
